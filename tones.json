@@ -1,0 +1,31 @@
+{
+  "_base": "Speak Persian (Farsi) with natural Tehrani pronunciation.",
+  "calm": "Say in a calm, clear, friendly explanatory tone, like talking to a smart friend. Steady pace.",
+  "curious": "Say with curiosity and light intrigue, slightly slower on the key question.",
+  "serious": "Say in a serious, steady, respectful tone. Slightly slower, no playfulness.",
+  "excited": "Say with warm energy and enthusiasm, a little faster, but not shouting.",
+  "warm": "Say warmly and conclusively, relaxed pace, like wrapping up a conversation.",
+  "edge": {
+    "_note": "مقدارهای اولیه و حدسی. فقط سرعت و زیروبمی قابل کنترله، نه احساس.",
+    "calm": {
+      "rate": "+0%",
+      "pitch": "+0Hz"
+    },
+    "curious": {
+      "rate": "-5%",
+      "pitch": "+2Hz"
+    },
+    "serious": {
+      "rate": "-10%",
+      "pitch": "-3Hz"
+    },
+    "excited": {
+      "rate": "+8%",
+      "pitch": "+3Hz"
+    },
+    "warm": {
+      "rate": "-8%",
+      "pitch": "-1Hz"
+    }
+  }
+}
