@@ -1,0 +1,19 @@
+name: gemini-tts-test
+on: workflow_dispatch
+jobs:
+  tts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python tts_prepare.py prison_input.json > prepared.json
+      - run: python gemini_tts_test.py prepared.json out_gemini
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gemini-out
+          path: out_gemini
