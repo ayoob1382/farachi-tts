@@ -8,10 +8,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - run: python tts_prepare.py prison_input.json > prepared.json
       - run: python gemini_tts_test.py prepared.json out_gemini
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      - run: python normalize.py out_gemini
       - uses: actions/upload-artifact@v4
         if: always()
         with:
