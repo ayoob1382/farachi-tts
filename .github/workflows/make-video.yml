@@ -1,0 +1,76 @@
+name: make-video
+
+on:
+  workflow_dispatch:
+    inputs:
+      script:
+        description: "اسم اسکریپت (بدون پسوند). فایل‌های NAME.json و NAME.html باید توی ریپو باشن"
+        default: "spotlight"
+      fake_voice:
+        description: "صدای ساختگی (Gemini مصرف نمی‌شه)"
+        type: boolean
+        default: false
+      tts_model:
+        description: "اسم مدل Gemini TTS (همونی که توی gemini_tts_test.py جواب داد)"
+        default: "gemini-3.1-flash-tts-preview"
+      workers:
+        description: "تعداد پردازش موازی رندر"
+        default: "4"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: نصب ابزارها
+        run: |
+          pip install google-genai numpy
+          npm install
+          npx playwright install --with-deps chromium
+          sudo apt-get install -y fonts-vazirmatn || echo "فونت وزیرمتن نصب نشد، از فونت پیش‌فرض استفاده می‌شه"
+
+      - name: ساخت صدا و زمان‌بندی
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_TTS_MODEL: ${{ inputs.tts_model }}
+        run: |
+          mkdir -p build
+          python build_audio.py "${{ inputs.script }}.json" --out build ${{ inputs.fake_voice && '--fake' || '' }}
+
+      - name: موزیک
+        run: |
+          MUSIC=$(ls music/* 2>/dev/null | head -1 || true)
+          if [ -z "$MUSIC" ]; then
+            echo "موزیکی توی پوشه music پیدا نشد، موزیک موقت ساخته می‌شه"
+            python make_music.py build/music.wav
+            MUSIC=build/music.wav
+          fi
+          echo "$MUSIC" > build/music_path.txt
+          echo "موزیک: $MUSIC"
+
+      - name: رندر فریم به فریم
+        run: |
+          node render.js "${{ inputs.script }}.html" build/silent.mp4 --dir build --workers "${{ inputs.workers }}"
+
+      - name: ترکیب صدا، موزیک و تصویر
+        run: |
+          python mix.py build/timings.json build/voice.wav "$(cat build/music_path.txt)" build/silent.mp4 build/final.mp4
+          ffprobe -v error -show_entries format=duration:stream=codec_name,width,height -of default=nw=1 build/final.mp4
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: farachi-video
+          path: |
+            build/final.mp4
+            build/timings.json
+          retention-days: 7
