@@ -1,0 +1,55 @@
+<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8">
+<style>
+html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#0f1424;font-family:"Vazirmatn","Vazir","Noto Naskh Arabic","DejaVu Sans",sans-serif}
+#stage{position:relative;width:1920px;height:1080px}
+svg{position:absolute;inset:0}
+#bar{position:absolute;left:0;right:0;bottom:0;height:150px;background:#0a0e1a;display:flex;align-items:center;justify-content:center}
+#cap{color:#fff;font-size:60px;font-weight:bold;direction:rtl;text-align:center;padding:0 80px;line-height:1.3}
+#clock{position:absolute;left:30px;top:20px;color:#6b7aa8;font:28px monospace;direction:ltr;display:none}
+</style></head><body><div id="stage">
+<svg viewBox="0 0 1920 1080" width="1920" height="1080">
+ <defs><linearGradient id="beam" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0" stop-color="#ffe9a8" stop-opacity=".9"/><stop offset="1" stop-color="#ffe9a8" stop-opacity=".05"/></linearGradient></defs>
+ <polygon id="cone" fill="url(#beam)" points="960,0 960,0 960,0"/>
+ <g transform="translate(0,-130)">
+  <g id="crowd"></g>
+  <g id="me"><circle cx="960" cy="560" r="55" fill="#ff8a5c"/><rect x="900" y="620" width="120" height="170" rx="30" fill="#ff8a5c"/></g>
+ </g>
+</svg>
+<div id="clock"></div><div id="bar"><div id="cap"></div></div></div>
+<script>
+const ease=x=>x<0?0:x>1?1:1-Math.pow(1-x,3);
+const DEBUG=location.search.includes('debug');
+if(DEBUG)document.getElementById('clock').style.display='block';
+let T=null;
+fetch('timings.json').then(r=>r.json()).then(j=>{T=j;build();
+  (document.fonts?document.fonts.ready:Promise.resolve()).then(()=>{window.ready=true})});
+function build(){
+  const g=document.getElementById('crowd');let h='';
+  for(let i=0;i<9;i++){const x=200+i*190,y=880;
+    h+=`<g class="p" data-i="${i}"><circle cx="${x}" cy="${y}" r="38" fill="#4c5b8f"/><rect x="${x-42}" y="${y+45}" width="84" height="120" rx="22" fill="#4c5b8f"/>
+    <circle class="eye" cx="${x}" cy="${y-5}" r="9" fill="#fff"/></g>`}
+  g.innerHTML=h;
+}
+// setTime(t): هر تصویر فقط تابعی از t است
+window.setTime=function(t){
+  if(!T)return;
+  if(DEBUG)document.getElementById('clock').textContent=t.toFixed(3)+'s';
+  const S=T.sentences;
+  let cur=null;S.forEach(s=>{if(t>=s.start&&t<s.end+0.2)cur=s});
+  const cap=document.getElementById('cap');
+  cap.textContent=cur?cur.text:'';
+  cap.style.opacity=cur?ease((t-cur.start)/0.25):0;
+  const s2=S[1], k=ease((t-s2.start)/1.2)-ease((t-S[2].start)/1.0);
+  const w=k*420;
+  document.getElementById('cone').setAttribute('points',`960,0 ${960-w},760 ${960+w},760`);
+  const a=ease((t-S[2].start)/1.5);
+  document.querySelectorAll('.p').forEach(p=>{
+    const i=+p.dataset.i;const look=(1-a)*(960-(200+i*190))/960*14;
+    p.querySelector('.eye').setAttribute('cx',200+i*190+look*(1-a)+a*(i%2?-12:12));
+    p.setAttribute('transform',`translate(0,${a*Math.sin(t*3+i)*6})`)});
+  const b=ease((t-S[3].start)/0.8);
+  document.getElementById('me').setAttribute('transform',`translate(0,${-Math.sin(Math.max(0,t-S[4].start)*4)*10*ease((t-S[4].start)/0.3)})`);
+  document.getElementById('crowd').setAttribute('opacity',0.55+0.45*(1-b*0.4));
+};
+</script></body></html>

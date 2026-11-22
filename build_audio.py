@@ -1,0 +1,148 @@
+#!/usr/bin/env python3
+"""
+ساخت صدا: هر segment یک درخواست جدا به Gemini.
+خروجی: <out>/voice.wav و <out>/timings.json (زمان دقیق شروع/پایان هر segment از طول واقعی صدا)
+
+استفاده:
+  python build_audio.py scripts/spotlight.json --out build            # با Gemini
+  python build_audio.py scripts/spotlight.json --out build --fake     # صدای ساختگی برای تست
+
+متغیرهای محیطی:
+  GEMINI_API_KEY   کلید Gemini
+  GEMINI_TTS_MODEL اسم مدل (پیش‌فرض: gemini-3.1-flash-tts-preview)
+"""
+import argparse, json, os, sys, time, wave, hashlib
+import numpy as np
+
+SR = 24000            # خروجی Gemini: PCM 16bit مونو ۲۴ کیلوهرتز
+LEAD = 0.6            # سکوت اول ویدیو
+GAP = 0.45            # مکث بین segmentها
+TAIL = 1.8            # سکوت آخر ویدیو
+TARGET_RMS_DB = -21.0 # بلندی هدف هر segment (برای یکدست شدن بین درخواست‌ها)
+
+
+def fake_speech(text, seed):
+    """صدای ساختگی: نویز مدوله‌شده شبیه هجا. طولش متناسب با تعداد حروف است."""
+    rng = np.random.default_rng(seed)
+    dur = max(1.2, len(text) * 0.07)
+    n = int(dur * SR)
+    t = np.arange(n) / SR
+    f0 = 120 + 25 * np.sin(2 * np.pi * 0.7 * t)
+    phase = 2 * np.pi * np.cumsum(f0) / SR
+    tone = sum(np.sin(k * phase) / k for k in range(1, 6))
+    syl = 0.5 + 0.5 * np.sin(2 * np.pi * 4.2 * t + rng.uniform(0, 6))
+    env = np.clip(syl, 0, 1) ** 1.5
+    fade = np.minimum(1, np.minimum(t / 0.05, (dur - t) / 0.12))
+    x = tone * env * fade
+    x = x / (np.abs(x).max() + 1e-9) * (0.2 + 0.05 * rng.random())  # بلندی تصادفی؛ نرمال‌سازی درستش می‌کند
+    return (x * 32767).astype(np.int16)
+
+
+def gemini_speech(text, voice, model, retries=5):
+    from google import genai
+    from google.genai import types
+    client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+    for attempt in range(1, retries + 1):
+        try:
+            resp = client.models.generate_content(
+                model=model,
+                contents=text,
+                config=types.GenerateContentConfig(
+                    response_modalities=["AUDIO"],
+                    speech_config=types.SpeechConfig(
+                        voice_config=types.VoiceConfig(
+                            prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name=voice)
+                        )
+                    ),
+                ),
+            )
+            data = resp.candidates[0].content.parts[0].inline_data.data
+            if not data:
+                raise RuntimeError("پاسخ بدون صدا برگشت")
+            return np.frombuffer(data, dtype=np.int16).copy()
+        except Exception as e:
+            msg = str(e)
+            wait = min(60, 5 * attempt * attempt)
+            print(f"  تلاش {attempt}/{retries} ناموفق: {msg[:200]}", file=sys.stderr)
+            if "API key" in msg or "PERMISSION" in msg or "403" in msg:
+                sys.exit("خطای کلید یا دسترسی. کلید GEMINI_API_KEY و محدودیت منطقه رو چک کن.")
+            if attempt == retries:
+                sys.exit(f"بعد از {retries} تلاش نشد. آخرین خطا: {msg[:300]}")
+            time.sleep(wait)
+
+
+def trim_silence(x, thresh=0.01, keep=0.08):
+    """سکوت اضافه‌ی اول و آخر هر segment رو کم می‌کنه تا زمان‌بندی دقیق بشه."""
+    a = np.abs(x.astype(np.float32)) / 32768
+    idx = np.where(a > thresh)[0]
+    if len(idx) == 0:
+        return x
+    s = max(0, idx[0] - int(keep * SR))
+    e = min(len(x), idx[-1] + int(keep * SR))
+    return x[s:e]
+
+
+def normalize_rms(x, target_db=TARGET_RMS_DB):
+    f = x.astype(np.float32) / 32768
+    active = f[np.abs(f) > 0.01]
+    rms = np.sqrt(np.mean(active ** 2)) if len(active) else 1e-4
+    gain = 10 ** (target_db / 20) / max(rms, 1e-6)
+    gain = min(gain, 8.0)
+    y = np.clip(f * gain, -0.97, 0.97)
+    return (y * 32767).astype(np.int16)
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("script")
+    ap.add_argument("--out", default="build")
+    ap.add_argument("--fake", action="store_true")
+    args = ap.parse_args()
+
+    spec = json.load(open(args.script, encoding="utf-8"))
+    segs = spec["segments"]
+    voice = spec.get("voice", "Kore")
+    model = os.environ.get("GEMINI_TTS_MODEL") or "gemini-3.1-flash-tts-preview"
+    os.makedirs(args.out, exist_ok=True)
+    cache_dir = os.path.join(args.out, "seg_cache")
+    os.makedirs(cache_dir, exist_ok=True)
+
+    if not args.fake and not os.environ.get("GEMINI_API_KEY"):
+        sys.exit("GEMINI_API_KEY تنظیم نشده. یا secret رو بذار یا با --fake تست کن.")
+
+    chunks, timings, cur = [], [], LEAD
+    chunks.append(np.zeros(int(LEAD * SR), dtype=np.int16))
+    for i, s in enumerate(segs):
+        text = s["text"].strip()
+        key = hashlib.sha1(f"{model}|{voice}|{text}|{args.fake}".encode()).hexdigest()[:16]
+        cf = os.path.join(cache_dir, f"{i:03d}_{key}.npy")
+        if os.path.exists(cf):
+            x = np.load(cf)
+            print(f"[{i+1}/{len(segs)}] از کش")
+        else:
+            print(f"[{i+1}/{len(segs)}] {text[:40]}")
+            raw = fake_speech(text, i) if args.fake else gemini_speech(text, voice, model)
+            x = normalize_rms(trim_silence(raw))
+            np.save(cf, x)
+            if not args.fake:
+                time.sleep(1.0)  # فاصله‌ی کوچک برای محدودیت نرخ
+        dur = len(x) / SR
+        timings.append({"start": round(cur, 3), "end": round(cur + dur, 3), "text": text})
+        chunks.append(x)
+        gap = GAP if i < len(segs) - 1 else TAIL
+        chunks.append(np.zeros(int(gap * SR), dtype=np.int16))
+        cur += dur + gap
+
+    total = cur
+    audio = np.concatenate(chunks)
+    with wave.open(os.path.join(args.out, "voice.wav"), "wb") as w:
+        w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR)
+        w.writeframes(audio.tobytes())
+    json.dump({"duration": round(total, 3), "title": spec.get("title", ""), "sentences": timings},
+              open(os.path.join(args.out, "timings.json"), "w", encoding="utf-8"),
+              ensure_ascii=False, indent=1)
+    print(f"voice.wav و timings.json ساخته شد. مدت کل: {total:.1f} ثانیه، {len(segs)} segment")
+
+
+if __name__ == "__main__":
+    main()
