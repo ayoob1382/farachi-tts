@@ -62,10 +62,13 @@ def decode_to_pcm(blob):
     اگه هدر نداشت، PCM خام ۲۴ کیلوهرتز فرض می‌شه."""
     import subprocess
     if blob[:4] in (b"RIFF", b"ID3\x03", b"OggS", b"fLaC") or blob[:2] == b"\xff\xfb":
-        r = subprocess.run(["ffmpeg", "-loglevel", "error", "-i", "pipe:0", "-f", "s16le",
-                            "-ar", str(SR), "-ac", "1", "pipe:1"], input=blob, capture_output=True)
+        try:
+            r = subprocess.run(["ffmpeg", "-loglevel", "error", "-i", "pipe:0", "-f", "s16le",
+                                "-ar", str(SR), "-ac", "1", "pipe:1"], input=blob, capture_output=True)
+        except FileNotFoundError:
+            sys.exit("ffmpeg روی این سیستم نصب نیست. (روی GitHub باید توی مرحله‌ی نصب ابزارها نصب بشه)")
         if r.returncode != 0:
-            raise RuntimeError("ffmpeg نتونست صدا رو بخونه: " + r.stderr.decode()[:200])
+            sys.exit("ffmpeg نتونست صدا رو بخونه: " + r.stderr.decode(errors="replace")[:300])
         return np.frombuffer(r.stdout, dtype=np.int16).copy()
     return np.frombuffer(blob, dtype=np.int16).copy()
 
