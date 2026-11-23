@@ -9,7 +9,7 @@
 
 متغیرهای محیطی:
   GEMINI_API_KEY   کلید Gemini
-  GEMINI_TTS_MODEL اسم مدل (پیش‌فرض: gemini-3.1-flash-tts-preview)
+  GEMINI_TTS_MODEL اسم مدل (پیش‌فرض: gemini-3.8-flash-tts)
 """
 import argparse, json, os, sys, time, wave, hashlib
 import numpy as np
@@ -38,37 +38,67 @@ def fake_speech(text, seed):
     return (x * 32767).astype(np.int16)
 
 
+URL = os.environ.get("GEMINI_URL") or "https://generativelanguage.googleapis.com/v1beta/interactions"
+
+
+def find_audio(node):
+    """آخرین بلوک صوتی (base64) رو هرجای پاسخ باشه پیدا می‌کنه. مثل gemini_tts_test.py"""
+    found = []
+    def walk(n):
+        if isinstance(n, dict):
+            if n.get("type") == "audio" and isinstance(n.get("data"), str):
+                found.append(n["data"])
+            for v in n.values():
+                walk(v)
+        elif isinstance(n, list):
+            for v in n:
+                walk(v)
+    walk(node)
+    return found[-1] if found else None
+
+
+def decode_to_pcm(blob):
+    """هر فرمت صوتی (wav و...) رو با ffmpeg به PCM مونو ۲۴ کیلوهرتز تبدیل می‌کنه.
+    اگه هدر نداشت، PCM خام ۲۴ کیلوهرتز فرض می‌شه."""
+    import subprocess
+    if blob[:4] in (b"RIFF", b"ID3\x03", b"OggS", b"fLaC") or blob[:2] == b"\xff\xfb":
+        r = subprocess.run(["ffmpeg", "-loglevel", "error", "-i", "pipe:0", "-f", "s16le",
+                            "-ar", str(SR), "-ac", "1", "pipe:1"], input=blob, capture_output=True)
+        if r.returncode != 0:
+            raise RuntimeError("ffmpeg نتونست صدا رو بخونه: " + r.stderr.decode()[:200])
+        return np.frombuffer(r.stdout, dtype=np.int16).copy()
+    return np.frombuffer(blob, dtype=np.int16).copy()
+
+
 def gemini_speech(text, voice, model, retries=5):
-    from google import genai
-    from google.genai import types
-    client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+    import base64, urllib.request, urllib.error
+    body = {"model": model,
+            "input": [{"type": "user_input", "content": [
+                {"type": "text", "text": text, "annotations": [{"type": "speech_metadata"}]}]}],
+            "response_format": {"type": "audio"},
+            "generation_config": {"speech_config": [{"voice": voice}]}}
     for attempt in range(1, retries + 1):
         try:
-            resp = client.models.generate_content(
-                model=model,
-                contents=text,
-                config=types.GenerateContentConfig(
-                    response_modalities=["AUDIO"],
-                    speech_config=types.SpeechConfig(
-                        voice_config=types.VoiceConfig(
-                            prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name=voice)
-                        )
-                    ),
-                ),
-            )
-            data = resp.candidates[0].content.parts[0].inline_data.data
+            req = urllib.request.Request(URL, data=json.dumps(body).encode(), method="POST",
+                headers={"Content-Type": "application/json", "x-goog-api-key": os.environ["GEMINI_API_KEY"]})
+            with urllib.request.urlopen(req, timeout=300) as r:
+                data = find_audio(json.loads(r.read()))
             if not data:
                 raise RuntimeError("پاسخ بدون صدا برگشت")
-            return np.frombuffer(data, dtype=np.int16).copy()
-        except Exception as e:
-            msg = str(e)
-            wait = min(60, 5 * attempt * attempt)
-            print(f"  تلاش {attempt}/{retries} ناموفق: {msg[:200]}", file=sys.stderr)
-            if "API key" in msg or "PERMISSION" in msg or "403" in msg:
-                sys.exit("خطای کلید یا دسترسی. کلید GEMINI_API_KEY و محدودیت منطقه رو چک کن.")
+            return decode_to_pcm(base64.b64decode(data))
+        except urllib.error.HTTPError as e:
+            detail = e.read().decode(errors="replace")[:400]
+            print(f"  تلاش {attempt}/{retries} ناموفق: HTTP {e.code} {detail}", file=sys.stderr)
+            if e.code in (400, 401, 403, 404):  # تکرارش فایده نداره
+                sys.exit(f"خطای HTTP {e.code} (تکرار نمی‌شه). مدل: {model}. جزئیات بالا.")
             if attempt == retries:
-                sys.exit(f"بعد از {retries} تلاش نشد. آخرین خطا: {msg[:300]}")
-            time.sleep(wait)
+                sys.exit(f"بعد از {retries} تلاش نشد (HTTP {e.code}).")
+            time.sleep(min(60, 5 * attempt * attempt))
+        except Exception as e:
+            print(f"  تلاش {attempt}/{retries} ناموفق: {str(e)[:200]}", file=sys.stderr)
+            if attempt == retries:
+                sys.exit(f"بعد از {retries} تلاش نشد. آخرین خطا: {str(e)[:300]}")
+            time.sleep(min(60, 5 * attempt * attempt))
 
 
 def trim_silence(x, thresh=0.01, keep=0.08):
@@ -102,7 +132,7 @@ def main():
     spec = json.load(open(args.script, encoding="utf-8"))
     segs = spec["segments"]
     voice = spec.get("voice", "Kore")
-    model = os.environ.get("GEMINI_TTS_MODEL") or "gemini-3.1-flash-tts-preview"
+    model = os.environ.get("GEMINI_TTS_MODEL") or "gemini-3.8-flash-tts"
     os.makedirs(args.out, exist_ok=True)
     cache_dir = os.path.join(args.out, "seg_cache")
     os.makedirs(cache_dir, exist_ok=True)
