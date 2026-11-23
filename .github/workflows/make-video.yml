@@ -12,7 +12,7 @@ on:
         default: false
       tts_model:
         description: "اسم مدل Gemini TTS (همونی که توی gemini_tts_test.py جواب داد)"
-        default: "gemini-3.1-flash-tts-preview"
+        default: "gemini-3.8-flash-tts"
       workers:
         description: "تعداد پردازش موازی رندر"
         default: "4"
@@ -34,7 +34,7 @@ jobs:
 
       - name: نصب ابزارها
         run: |
-          pip install google-genai numpy
+          pip install numpy
           npm install
           npx playwright install --with-deps chromium
           sudo apt-get install -y fonts-vazirmatn || echo "فونت وزیرمتن نصب نشد، از فونت پیش‌فرض استفاده می‌شه"
@@ -74,3 +74,4 @@ jobs:
             build/final.mp4
             build/timings.json
           retention-days: 7
+          
