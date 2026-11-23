@@ -37,7 +37,10 @@ jobs:
           pip install numpy
           npm install
           npx playwright install --with-deps chromium
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
           sudo apt-get install -y fonts-vazirmatn || echo "فونت وزیرمتن نصب نشد، از فونت پیش‌فرض استفاده می‌شه"
+          ffmpeg -version | head -1
 
       - name: ساخت صدا و زمان‌بندی
         env:
