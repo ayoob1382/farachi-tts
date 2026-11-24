@@ -125,6 +125,61 @@ def normalize_rms(x, target_db=TARGET_RMS_DB):
     return (y * 32767).astype(np.int16)
 
 
+def f0_of(x):
+    """زیر و بمی (هرتز) = میانه‌ی فرکانس پایه‌ی فریم‌های صدادار. اگه صدایی پیدا نشد None."""
+    f = x.astype(np.float32) / 32768
+    f = f[: len(f) // 3 * 3].reshape(-1, 3).mean(axis=1)   # ۲۴k -> ۸k
+    sr = SR // 3
+    win, hop = int(0.04 * sr), int(0.02 * sr)
+    lo, hi = int(sr / 400), int(sr / 70)
+    vals = []
+    for a in range(0, len(f) - win - hi, hop):
+        fr = f[a:a + win + hi]
+        seg = fr[:win]
+        if np.sqrt(np.mean(seg ** 2)) < 0.02:
+            continue
+        seg = seg - seg.mean()
+        ac = np.array([np.dot(seg, fr[l:l + win]) for l in range(lo, hi)])
+        e0 = np.dot(seg, seg) + 1e-9
+        k = int(np.argmax(ac))
+        if ac[k] / e0 > 0.5:
+            vals.append(sr / (lo + k))
+    return float(np.median(vals)) if len(vals) >= 5 else None
+
+
+def fix_voice_outliers(xs, segs, voice, model, cache_files, tol=0.25, tries=3):
+    """جمله‌هایی که زیر و بمی‌شون با میانه‌ی بقیه فرق داره (مثلاً صدای مرد وسط صدای زن) دوباره ساخته می‌شن."""
+    f0s = [f0_of(x) for x in xs]
+    known = [v for v in f0s if v]
+    if len(known) < 3:
+        print("برای کنترل صدا جمله‌ی کافی نیست، رد شد.")
+        return
+    ref = float(np.median(known))
+    print(f"کنترل یکدستی صدا: مرجع ~{ref:.0f} هرتز")
+    for i, v in enumerate(f0s):
+        label = f"{v:.0f} هرتز" if v else "نامشخص"
+        if v is None or abs(v - ref) / ref <= tol:
+            print(f"  segment {i+1}: {label}  OK")
+            continue
+        print(f"  segment {i+1}: {label}  با بقیه نمی‌خونه")
+        best_dev, best_x = abs(v - ref) / ref, xs[i]
+        for t in range(1, tries + 1):
+            print(f"    ساخت دوباره {t}/{tries}")
+            time.sleep(1.0)
+            x = normalize_rms(trim_silence(gemini_speech(segs[i]["text"].strip(), voice, model)))
+            v2 = f0_of(x)
+            dev = abs(v2 - ref) / ref if v2 else 9
+            print(f"    -> {v2:.0f} هرتز" if v2 else "    -> نامشخص")
+            if dev < best_dev:
+                best_dev, best_x = dev, x
+            if dev <= tol:
+                break
+        xs[i] = best_x
+        np.save(cache_files[i], best_x)
+        if best_dev > tol:
+            print(f"  هشدار: segment {i+1} بعد از {tries} بار هنوز با بقیه نمی‌خونه. موقع دیدن ویدیو گوش بده و اگه لازم بود متنش رو بلندتر کن یا با جمله‌ی کناری ادغام کن.")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("script")
@@ -143,8 +198,7 @@ def main():
     if not args.fake and not os.environ.get("GEMINI_API_KEY"):
         sys.exit("GEMINI_API_KEY تنظیم نشده. یا secret رو بذار یا با --fake تست کن.")
 
-    chunks, timings, cur = [], [], LEAD
-    chunks.append(np.zeros(int(LEAD * SR), dtype=np.int16))
+    xs, cache_files = [], []
     for i, s in enumerate(segs):
         text = s["text"].strip()
         key = hashlib.sha1(f"{model}|{voice}|{text}|{args.fake}".encode()).hexdigest()[:16]
@@ -159,6 +213,16 @@ def main():
             np.save(cf, x)
             if not args.fake:
                 time.sleep(1.0)  # فاصله‌ی کوچک برای محدودیت نرخ
+        xs.append(x)
+        cache_files.append(cf)
+
+    if not args.fake:
+        fix_voice_outliers(xs, segs, voice, model, cache_files)
+
+    chunks, timings, cur = [], [], LEAD
+    chunks.append(np.zeros(int(LEAD * SR), dtype=np.int16))
+    for i, (s, x) in enumerate(zip(segs, xs)):
+        text = s["text"].strip()
         dur = len(x) / SR
         timings.append({"start": round(cur, 3), "end": round(cur + dur, 3), "text": text})
         chunks.append(x)
@@ -179,3 +243,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+  
