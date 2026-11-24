@@ -38,6 +38,25 @@ def fake_speech(text, seed):
     return (x * 32767).astype(np.int16)
 
 
+# لحن‌های آماده (همون‌هایی که توی gemini_tts_test.py بود). توی اسکریپت با "tone": "calm" صدا می‌زنی.
+STYLES = {
+    "calm": "calm, clear and friendly, like explaining something to a smart friend",
+    "curious": "curious and lightly intrigued, natural conversational pace",
+    "serious": "serious, steady and respectful",
+    "excited": "warm and energetic, not shouting",
+    "warm": "warm and conclusive, relaxed pace",
+}
+
+
+def resolve(seg, spec):
+    """صدا و لحن یک جمله. اولویت: خود جمله، بعد پیش‌فرض کل اسکریپت. لحن خالی = بدون دستور لحن."""
+    voice = seg.get("voice") or spec.get("voice") or "Kore"
+    style = seg.get("style") or STYLES.get(seg.get("tone", ""), None)
+    if not style and "style" not in seg and "tone" not in seg:
+        style = spec.get("style") or STYLES.get(spec.get("tone", ""), None)
+    return voice, style
+
+
 URL = os.environ.get("GEMINI_URL") or "https://generativelanguage.googleapis.com/v1beta/interactions"
 
 
@@ -73,11 +92,14 @@ def decode_to_pcm(blob):
     return np.frombuffer(blob, dtype=np.int16).copy()
 
 
-def gemini_speech(text, voice, model, retries=5):
+def gemini_speech(text, voice, model, style=None, retries=5):
     import base64, urllib.request, urllib.error
+    ann = {"type": "speech_metadata"}
+    if style:
+        ann["style"] = style
     body = {"model": model,
             "input": [{"type": "user_input", "content": [
-                {"type": "text", "text": text, "annotations": [{"type": "speech_metadata"}]}]}],
+                {"type": "text", "text": text, "annotations": [ann]}]}],
             "response_format": {"type": "audio"},
             "generation_config": {"speech_config": [{"voice": voice}]}}
     for attempt in range(1, retries + 1):
@@ -147,37 +169,41 @@ def f0_of(x):
     return float(np.median(vals)) if len(vals) >= 5 else None
 
 
-def fix_voice_outliers(xs, segs, voice, model, cache_files, tol=0.25, tries=3):
-    """جمله‌هایی که زیر و بمی‌شون با میانه‌ی بقیه فرق داره (مثلاً صدای مرد وسط صدای زن) دوباره ساخته می‌شن."""
+def fix_voice_outliers(xs, segs, plan, model, cache_files, tol=0.25, tries=3):
+    """جمله‌هایی که زیر و بمی‌شون با میانه‌ی جمله‌های هم‌صدای خودشون فرق داره دوباره ساخته می‌شن.
+    مقایسه فقط داخل هر صدا انجام می‌شه، چون صداهای مختلف طبیعتاً زیر و بمی متفاوت دارن."""
     f0s = [f0_of(x) for x in xs]
-    known = [v for v in f0s if v]
-    if len(known) < 3:
-        print("برای کنترل صدا جمله‌ی کافی نیست، رد شد.")
-        return
-    ref = float(np.median(known))
-    print(f"کنترل یکدستی صدا: مرجع ~{ref:.0f} هرتز")
-    for i, v in enumerate(f0s):
-        label = f"{v:.0f} هرتز" if v else "نامشخص"
-        if v is None or abs(v - ref) / ref <= tol:
-            print(f"  segment {i+1}: {label}  OK")
+    for voice in sorted({v for v, _ in plan}):
+        idx = [i for i, (v, _) in enumerate(plan) if v == voice]
+        known = [f0s[i] for i in idx if f0s[i]]
+        if len(known) < 3:
+            print(f"کنترل صدا برای {voice}: جمله‌ی کافی نیست (حداقل ۳ تا)، رد شد.")
             continue
-        print(f"  segment {i+1}: {label}  با بقیه نمی‌خونه")
-        best_dev, best_x = abs(v - ref) / ref, xs[i]
-        for t in range(1, tries + 1):
-            print(f"    ساخت دوباره {t}/{tries}")
-            time.sleep(1.0)
-            x = normalize_rms(trim_silence(gemini_speech(segs[i]["text"].strip(), voice, model)))
-            v2 = f0_of(x)
-            dev = abs(v2 - ref) / ref if v2 else 9
-            print(f"    -> {v2:.0f} هرتز" if v2 else "    -> نامشخص")
-            if dev < best_dev:
-                best_dev, best_x = dev, x
-            if dev <= tol:
-                break
-        xs[i] = best_x
-        np.save(cache_files[i], best_x)
-        if best_dev > tol:
-            print(f"  هشدار: segment {i+1} بعد از {tries} بار هنوز با بقیه نمی‌خونه. موقع دیدن ویدیو گوش بده و اگه لازم بود متنش رو بلندتر کن یا با جمله‌ی کناری ادغام کن.")
+        ref = float(np.median(known))
+        print(f"کنترل یکدستی صدای {voice}: مرجع ~{ref:.0f} هرتز")
+        for i in idx:
+            v = f0s[i]
+            label = f"{v:.0f} هرتز" if v else "نامشخص"
+            if v is None or abs(v - ref) / ref <= tol:
+                print(f"  segment {i+1}: {label}  OK")
+                continue
+            print(f"  segment {i+1}: {label}  با بقیه نمی‌خونه")
+            best_dev, best_x = abs(v - ref) / ref, xs[i]
+            for t in range(1, tries + 1):
+                print(f"    ساخت دوباره {t}/{tries}")
+                time.sleep(1.0)
+                x = normalize_rms(trim_silence(gemini_speech(segs[i]["text"].strip(), plan[i][0], model, plan[i][1])))
+                v2 = f0_of(x)
+                dev = abs(v2 - ref) / ref if v2 else 9
+                print(f"    -> {v2:.0f} هرتز" if v2 else "    -> نامشخص")
+                if dev < best_dev:
+                    best_dev, best_x = dev, x
+                if dev <= tol:
+                    break
+            xs[i] = best_x
+            np.save(cache_files[i], best_x)
+            if best_dev > tol:
+                print(f"  هشدار: segment {i+1} بعد از {tries} بار هنوز با بقیه نمی‌خونه. موقع دیدن ویدیو گوش بده و اگه لازم بود متنش رو بلندتر کن یا با جمله‌ی کناری ادغام کن.")
 
 
 def main():
@@ -189,7 +215,7 @@ def main():
 
     spec = json.load(open(args.script, encoding="utf-8"))
     segs = spec["segments"]
-    voice = spec.get("voice", "Kore")
+    plan = [resolve(sg, spec) for sg in segs]   # (صدا، لحن) هر جمله
     model = os.environ.get("GEMINI_TTS_MODEL") or "gemini-3.8-flash-tts"
     os.makedirs(args.out, exist_ok=True)
     cache_dir = os.path.join(args.out, "seg_cache")
@@ -201,14 +227,15 @@ def main():
     xs, cache_files = [], []
     for i, s in enumerate(segs):
         text = s["text"].strip()
-        key = hashlib.sha1(f"{model}|{voice}|{text}|{args.fake}".encode()).hexdigest()[:16]
+        voice, style = plan[i]
+        key = hashlib.sha1(f"{model}|{voice}|{style}|{text}|{args.fake}".encode()).hexdigest()[:16]
         cf = os.path.join(cache_dir, f"{i:03d}_{key}.npy")
         if os.path.exists(cf):
             x = np.load(cf)
             print(f"[{i+1}/{len(segs)}] از کش")
         else:
-            print(f"[{i+1}/{len(segs)}] {text[:40]}")
-            raw = fake_speech(text, i) if args.fake else gemini_speech(text, voice, model)
+            print(f"[{i+1}/{len(segs)}] {voice}{' | ' + style[:30] if style else ''} | {text[:30]}")
+            raw = fake_speech(text, i) if args.fake else gemini_speech(text, voice, model, style)
             x = normalize_rms(trim_silence(raw))
             np.save(cf, x)
             if not args.fake:
@@ -217,7 +244,7 @@ def main():
         cache_files.append(cf)
 
     if not args.fake:
-        fix_voice_outliers(xs, segs, voice, model, cache_files)
+        fix_voice_outliers(xs, segs, plan, model, cache_files)
 
     chunks, timings, cur = [], [], LEAD
     chunks.append(np.zeros(int(LEAD * SR), dtype=np.int16))
@@ -243,4 +270,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-  
