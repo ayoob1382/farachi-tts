@@ -15,6 +15,7 @@ from typing import Any
 
 
 PRODUCTION_ORDER = [
+    "farachi-animation-director",
     "storyboarding",
     "motion-design",
     "composition",
@@ -175,6 +176,7 @@ def build_execution_plan(
     # Base production passes are always included. Scene-specific skills are added
     # only when requested or detected from the brief.
     base = [
+        "farachi-animation-director",
         "storyboarding",
         "motion-design",
         "composition",
