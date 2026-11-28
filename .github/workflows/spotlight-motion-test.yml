@@ -1,0 +1,51 @@
+name: FARACHI — Spotlight Motion Test
+on:
+  push:
+    branches: [feat/farachi-motion-skills]
+    paths:
+      - "tests/spotlight-motion/**"
+      - ".github/workflows/spotlight-motion-test.yml"
+permissions:
+  contents: read
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/farachi-motion-skills
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install renderer and media dependencies
+        run: |
+          npm install
+          npx playwright install --with-deps chromium
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-vazirmatn || true
+      - name: Generate sync cue track
+        run: python tests/spotlight-motion/make_sync_audio.py
+      - name: Render animation (absolute-time timeline)
+        run: |
+          mkdir -p build/spotlight
+          node render.js tests/spotlight-motion/spotlight.html build/spotlight/silent.mp4 --dir tests/spotlight-motion --fps 30 --workers 4
+      - name: Mux audible timing cues into preview
+        run: |
+          ffmpeg -y -i build/spotlight/silent.mp4 -i tests/spotlight-motion/sync-cues.wav -map 0:v -map 1:a -c:v copy -c:a aac -b:a 128k -shortest build/spotlight/spotlight-motion-test.mp4
+          ffprobe -v error -show_entries format=duration:stream=codec_name,width,height,r_frame_rate -of default=nw=1 build/spotlight/spotlight-motion-test.mp4
+      - name: Upload preview and source
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: farachi-spotlight-motion-test
+          path: |
+            build/spotlight/spotlight-motion-test.mp4
+            build/spotlight/silent.mp4
+            tests/spotlight-motion/timings.json
+            tests/spotlight-motion/spotlight.html
+            tests/spotlight-motion/sync-cues.wav
+          retention-days: 7
