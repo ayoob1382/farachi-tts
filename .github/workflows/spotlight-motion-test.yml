@@ -1,5 +1,10 @@
 name: FARACHI — Spotlight Motion Test
 on:
+  push:
+    branches: [feat/farachi-motion-skills]
+    paths:
+      - "tests/spotlight-motion/**"
+      - ".github/workflows/spotlight-motion-test.yml"
   workflow_dispatch:
     inputs:
       tts_model:
@@ -40,7 +45,7 @@ jobs:
       - name: ساخت صدا و زمان‌بندی (عین make-video)
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_TTS_MODEL: ${{ inputs.tts_model }}
+          GEMINI_TTS_MODEL: ${{ inputs.tts_model || 'gemini-3.8-flash-tts' }}
         run: |
           mkdir -p build
           python build_audio.py spotlight.json --out build
@@ -58,7 +63,7 @@ jobs:
 
       - name: رندر صحنه آزمایشی با همان timings.json
         run: |
-          node render.js tests/spotlight-motion/spotlight.html build/silent.mp4 --dir build --workers "${{ inputs.workers }}"
+          node render.js tests/spotlight-motion/spotlight.html build/silent.mp4 --dir build --workers "${{ inputs.workers || '4' }}"
 
       - name: ترکیب صدا، موزیک و تصویر (عین make-video)
         run: |
