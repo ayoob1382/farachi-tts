@@ -1,0 +1,22 @@
+# FARACHI Motion Skills
+
+This directory contains original, project-specific skill guides for the FARACHI video workflow.
+
+## Important
+These are instruction files, not executable plugins and not a global installation into ChatGPT. They can be read by ChatGPT through the connected GitHub repository or included in a ChatGPT Project/custom instructions workflow. Availability in unrelated chats is not automatic.
+
+## Skill set
+- [Motion Design](./motion-design/SKILL.md)
+- [2D Animation](./2d-animation/SKILL.md)
+- [Kinetic Typography](./kinetic-typography/SKILL.md)
+- [Animated Charts](./animated-charts/SKILL.md)
+- [Infographics](./infographics/SKILL.md)
+- [Storyboarding](./storyboarding/SKILL.md)
+- [Composition](./composition/SKILL.md)
+- [Timing & Easing](./timing-easing/SKILL.md)
+- [Transitions](./transitions/SKILL.md)
+- [Visual Effects](./visual-effects/SKILL.md)
+- [Video Rendering](./video-rendering/SKILL.md)
+
+## Use
+Read the relevant `SKILL.md` before planning or implementing that part of a video. For a full production, combine Storyboarding, Motion Design, Composition, Timing & Easing, and the scene-specific skills. Use Video Rendering for final implementation and validation.
