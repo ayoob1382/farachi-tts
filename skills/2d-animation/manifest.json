@@ -1,0 +1,13 @@
+{
+  "name": "2D Animation",
+  "id": "2d-animation",
+  "version": "1.0.0",
+  "description": "Design purposeful 2D movement using layers, transforms, masks, paths, shape morphs, and character/object acting.",
+  "entrypoint": "SKILL.md",
+  "status": "draft",
+  "tags": [
+    "farachi",
+    "motion-graphics",
+    "video-production"
+  ]
+}
