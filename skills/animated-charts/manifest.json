@@ -1,0 +1,13 @@
+{
+  "name": "Animated Charts",
+  "id": "animated-charts",
+  "version": "1.0.0",
+  "description": "Turn data and comparisons into accurate animated charts.",
+  "entrypoint": "SKILL.md",
+  "status": "draft",
+  "tags": [
+    "farachi",
+    "motion-graphics",
+    "video-production"
+  ]
+}
