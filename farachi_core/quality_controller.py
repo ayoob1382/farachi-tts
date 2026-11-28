@@ -116,7 +116,7 @@ def audit_scene_html(path: Path, report: list[dict[str, str]]) -> None:
                 "Scene contains an infinite CSS animation that may not follow the renderer's absolute timeline.",
                 "Drive the motion from setTime(t), or explicitly synchronize the CSS animation to absolute time.")
 
-    if re.search(r"\b(?:while|for)\s*\(\s*;?\s*;?\s*\)", source):
+    if re.search(r"\bwhile\s*\(\s*(?:true|1)\s*\)|\bfor\s*\(\s*;\s*;\s*\)", source):
         finding(report, "error", "SCENE_UNBOUNDED_LOOP",
                 "A potentially unbounded loop pattern was detected.",
                 "Remove blocking loops; keep scene initialization finite and frame updates synchronous.")
