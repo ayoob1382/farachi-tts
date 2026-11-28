@@ -19,6 +19,7 @@ Audit target: `feat/farachi-motion-skills`
 - No executable `farachi_core` package was present in the inspected branch.
 - No shared project JSON schema was present.
 - No automated tests for skill routing or the project/timing contracts were present.
+- No Quality Controller existed to inspect scene contracts, timeline gaps/overlaps, or final render metadata.
 - No `config/settings.json` exists in this branch's tracked tree. Do not assume the earlier Colab Drive configuration is part of this Git branch.
 
 ## Boundaries introduced
@@ -55,5 +56,6 @@ mix.py -> final MP4
 
 - Run `python -m unittest discover -s tests -v` (also enforced by `.github/workflows/test-core.yml`).
 - Validate a real project brief and a real `build/timings.json` from a workflow artifact.
-- Add a Quality Controller only after the scene/project contract has been exercised against real video projects.
+- Exercise the Quality Controller against real scene HTML and final MP4 outputs; its static and pixel-sample checks are heuristics, not semantic review.
+- Add a human frame/audio review gate and a documented approval record before calling a render production-ready.
 - Do not mark the 11 skills production-ready until their procedures have been tested against actual scenes and outputs.
