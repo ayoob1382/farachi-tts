@@ -1,0 +1,55 @@
+name: FARACHI — 60s Animation Director Test
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/farachi-motion-skills
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - name: Install renderer and audio tools
+        run: |
+          pip install numpy
+          npm install
+          npx playwright install --with-deps chromium
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-vazirmatn || true
+      - name: Generate Persian voice and timeline
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_TTS_MODEL: gemini-3.8-flash-tts
+        run: |
+          mkdir -p build
+          python build_audio.py tests/animation-director-60s/script.json --out build
+      - name: Music bed
+        run: |
+          MUSIC=$(ls music/* 2>/dev/null | head -1 || true)
+          if [ -z "$MUSIC" ]; then python make_music.py build/music.wav; MUSIC=build/music.wav; fi
+          echo "$MUSIC" > build/music_path.txt
+      - name: Render animated scenes
+        run: node render.js tests/animation-director-60s/scene.html build/silent.mp4 --dir build --workers 4
+      - name: Mix narration music and animation
+        run: |
+          python mix.py build/timings.json build/voice.wav "$(cat build/music_path.txt)" build/silent.mp4 build/final.mp4
+          ffprobe -v error -show_entries format=duration:stream=codec_name,width,height -of default=nw=1 build/final.mp4
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: farachi-animation-director-60s-test
+          path: |
+            build/final.mp4
+            build/voice.wav
+            build/timings.json
+            tests/animation-director-60s/script.json
+            tests/animation-director-60s/scene.html
+          retention-days: 7
