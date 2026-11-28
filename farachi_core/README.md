@@ -9,6 +9,7 @@ The Core is the orchestration and validation layer around the existing FARACHI p
 - Select scene-specific skills from project brief keywords and explicit selections.
 - Validate the shared project brief and the existing audio builder's `timings.json` output.
 - Write an execution plan that references the original `SKILL.md` guides.
+- Audit project timelines, scene HTML contracts, deterministic animation hazards, and (when supplied) final MP4 metadata and sampled-frame repetition.
 
 The plan status is `planned_not_executed`: the Core does not call an LLM or autonomously execute skill instructions.
 
@@ -21,6 +22,8 @@ python -m farachi_core.skill_manager list-skills
 python -m farachi_core.skill_manager validate-project examples/minimal-project.json
 python -m farachi_core.skill_manager plan examples/minimal-project.json --out build/execution-plan.json
 python -m farachi_core.skill_manager validate-timings build/timings.json
+python -m farachi_core.quality_controller examples/minimal-project.json
+python -m farachi_core.quality_controller examples/minimal-project.json --timings build/timings.json --scene path/to/scene.html --video build/final.mp4
 python -m unittest discover -s tests -v
 ```
 
@@ -34,4 +37,6 @@ python -m unittest discover -s tests -v
 
 - Planning only; no LLM provider or skill execution adapter is implemented.
 - Project-level JSON validation is implemented in Python; the JSON Schema is provided for editors and external validators.
-- The manager does not assess visual quality. A Quality Controller should be added after real project and render outputs have exercised these contracts.
+- The Quality Controller is a screening layer, not an automated creative director. It cannot determine semantic relevance, scientific accuracy, Persian typography quality or aesthetic polish.
+- Its pixel-diversity check is a coarse heuristic; human review of representative frames and the complete audio/video remains mandatory.
+- Missing scene/video inputs are reported as review warnings; structural contract failures and timeline overlaps fail the audit.
