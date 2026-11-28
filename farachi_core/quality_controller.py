@@ -58,16 +58,21 @@ def audit_timeline(project: dict[str, Any], report: list[dict[str, str]]) -> Non
         finding(report, "warning", "TIMELINE_HEAD_GAP",
                 f"Timeline starts at {ordered[0]['start']:.2f}s; the opening may be uncovered.",
                 "Cover the opening with an intentional visual or explicitly document the opening pause.")
-    for previous, current in zip(ordered, ordered[1:]):
-        gap = current["start"] - previous["end"]
+    active_end = ordered[0]["end"]
+    active_scene = ordered[0]
+    for current in ordered[1:]:
+        gap = current["start"] - active_end
         if gap > 0.25:
             finding(report, "warning", "TIMELINE_GAP",
-                    f"Unassigned visual gap of {gap:.2f}s between {previous.get('id')} and {current.get('id')}.",
+                    f"Unassigned visual gap of {gap:.2f}s between {active_scene.get('id')} and {current.get('id')}.",
                     "Add a scene or make the pause an explicit storyboard decision.")
         elif gap < -0.10:
             finding(report, "error", "TIMELINE_OVERLAP",
-                    f"Scenes {previous.get('id')} and {current.get('id')} overlap by {-gap:.2f}s.",
+                    f"Scene {current.get('id')} overlaps {active_scene.get('id')} by {-gap:.2f}s.",
                     "Resolve the overlap or represent the intended compositing explicitly.")
+        if current["end"] > active_end:
+            active_end = current["end"]
+            active_scene = current
     tail = duration - ordered[-1]["end"]
     if tail > 0.5:
         finding(report, "warning", "TIMELINE_TAIL_GAP",
