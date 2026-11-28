@@ -306,9 +306,9 @@ function update(t){
   const fade=.55;
   const a=ease((t-s.start)/fade);
   const b=1-ease((t-(s.end-fade))/fade);
-  const alpha=i===active?Math.min(a,b):0;
+  const alpha=Math.min(a,b);
   setOpacity('scene-'+s.id,alpha);
-  if(i===active){
+  if(alpha>0){
    const p=clamp((t-s.start)/Math.max(.001,s.end-s.start));
    animateScene(s.id,p,t);
   }
