@@ -16,6 +16,9 @@ on:
       workers:
         description: "تعداد پردازش موازی رندر"
         default: "4"
+      fps:
+        description: "نرخ فریم برای تست طولانی (پیشنهاد: 15)"
+        default: "15"
 
 jobs:
   build:
@@ -63,7 +66,7 @@ jobs:
 
       - name: رندر فریم به فریم
         run: |
-          node render.js "${{ inputs.script }}.html" build/silent.mp4 --dir build --workers "${{ inputs.workers }}"
+          node render.js "${{ inputs.script }}.html" build/silent.mp4 --dir build --workers "${{ inputs.workers }}" --fps "${{ inputs.fps }}"
 
       - name: ترکیب صدا، موزیک و تصویر
         run: |
