@@ -1,0 +1,77 @@
+name: test-motion
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  render-motion-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout test branch
+        uses: actions/checkout@v4
+        with:
+          ref: test/motion-engine-validation
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip numpy
+          npm install
+          npx playwright install --with-deps chromium
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-vazirmatn || sudo apt-get install -y ffmpeg
+          ffmpeg -version | head -1
+          node --version
+          python --version
+
+      - name: Build test audio and timings (fake voice, no API key)
+        run: |
+          mkdir -p build
+          python build_audio.py motion_test.json --out build --fake
+          python - <<'PY'
+          import json
+          d=json.load(open("build/timings.json", encoding="utf-8"))
+          print("Expected audio duration:", d["duration"])
+          print("Segments:", len(d["sentences"]))
+          assert len(d["sentences"]) == 60, "Expected 60 test segments"
+          assert d["duration"] >= 450, f"Test audio is too short: {d['duration']}s"
+          PY
+
+      - name: Render animated scene at 15 FPS
+        run: |
+          node render.js motion_test.html build/silent.mp4 --dir build --workers 4 --fps 15
+          test -s build/silent.mp4
+          ffprobe -v error -show_entries format=duration:stream=codec_name,width,height,r_frame_rate -of default=nw=1 build/silent.mp4
+
+      - name: Mix audio and video
+        run: |
+          python make_music.py build/music.wav
+          python mix.py build/timings.json build/voice.wav build/music.wav build/silent.mp4 build/final.mp4
+          test -s build/final.mp4
+          ffprobe -v error -show_entries format=duration:stream=codec_name,width,height,r_frame_rate -of default=nw=1 build/final.mp4
+
+      - name: Upload render and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: farachi-motion-test
+          path: |
+            build/final.mp4
+            build/silent.mp4
+            build/timings.json
+            build/voice.wav
+          if-no-files-found: warn
+          retention-days: 7
