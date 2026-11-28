@@ -37,6 +37,19 @@ class QualityControllerTests(unittest.TestCase):
             for x in report
         ))
 
+    def test_nested_timeline_overlap_is_detected(self):
+        report = []
+        project = {
+            "duration_seconds": 10,
+            "scenes": [
+                {"id": "long", "start": 0, "end": 8},
+                {"id": "nested", "start": 2, "end": 3},
+                {"id": "after", "start": 8, "end": 10},
+            ],
+        }
+        audit_timeline(project, report)
+        self.assertTrue(any(x["code"] == "TIMELINE_OVERLAP" for x in report))
+
     def test_scene_contract_and_nondeterminism_are_detected(self):
         with tempfile.TemporaryDirectory() as temp:
             scene = Path(temp) / "scene.html"
@@ -51,6 +64,17 @@ class QualityControllerTests(unittest.TestCase):
             self.assertIn("SCENE_NONDETERMINISM", codes)
             self.assertNotIn("SCENE_READY_CONTRACT", codes)
             self.assertNotIn("SCENE_SETTIME_CONTRACT", codes)
+
+    def test_unbounded_while_loop_is_detected(self):
+        with tempfile.TemporaryDirectory() as temp:
+            scene = Path(temp) / "scene.html"
+            scene.write_text(
+                "<html><script>window.ready=true; window.setTime=(t)=>{}; while(true) {}</script></html>",
+                encoding="utf-8",
+            )
+            report = []
+            audit_scene_html(scene, report)
+            self.assertIn("SCENE_UNBOUNDED_LOOP", {x["code"] for x in report})
 
     def test_missing_scene_contract_is_error(self):
         with tempfile.TemporaryDirectory() as temp:
