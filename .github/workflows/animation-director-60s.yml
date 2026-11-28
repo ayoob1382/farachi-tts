@@ -1,5 +1,10 @@
 name: FARACHI — 60s Animation Director Test
 on:
+  push:
+    branches: [feat/farachi-motion-skills]
+    paths:
+      - "tests/animation-director-60s/**"
+      - ".github/workflows/animation-director-60s.yml"
   workflow_dispatch:
 permissions:
   contents: read
