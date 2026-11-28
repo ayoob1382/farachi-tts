@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1920,initial-scale=1">
+<title>FARACHI — فرضیه ریمان</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#080f20;color:#f5f8ff;font-family:"Vazirmatn","Vazir","Noto Sans Arabic","DejaVu Sans",sans-serif}
+#stage{position:relative;width:1920px;height:1080px;overflow:hidden;background:radial-gradient(ellipse at 50% 35%,#142646 0%,#080f20 68%)}
+svg{position:absolute;inset:0;width:1920px;height:1080px}
+.scene{opacity:0;transform-origin:960px 470px}
+.scene-title{font-size:30px;font-weight:700;fill:#d7e7f6}
+.math{font-family:Georgia,"Times New Roman",serif;direction:ltr}
+.muted{fill:#8294b7}
+.cyan{fill:#55e6d2}
+.amber{fill:#ffb45c}
+.coral{fill:#ff6f75}
+#topline{position:absolute;top:40px;left:72px;right:72px;display:flex;align-items:center;justify-content:space-between;z-index:5;direction:rtl}
+#brand{font-size:26px;font-weight:800;letter-spacing:2px;color:#55e6d2}
+#chapter{font-size:25px;color:#d9e6f6;font-weight:600}
+#progress{position:absolute;top:104px;left:72px;right:72px;height:4px;background:#1e2b45;border-radius:4px;z-index:5;overflow:hidden}
+#progress-fill{height:100%;width:0;background:linear-gradient(90deg,#55e6d2,#ffb45c);transform-origin:right}
+#caption-wrap{position:absolute;left:0;right:0;bottom:0;height:196px;background:linear-gradient(180deg,rgba(8,15,32,0),rgba(8,15,32,.92) 22%,#080f20 100%);display:flex;align-items:flex-end;justify-content:center;padding:0 110px 48px;z-index:6}
+#caption{width:100%;min-height:84px;display:flex;align-items:center;justify-content:center;text-align:center;direction:rtl;font-size:43px;line-height:1.55;font-weight:700;color:#fff;text-shadow:0 3px 20px rgba(0,0,0,.65);opacity:0}
+#clock{position:absolute;top:42px;left:72px;color:#8294b7;font:20px monospace;direction:ltr;z-index:9;display:none}
+#footnote{position:absolute;bottom:16px;right:72px;color:#657796;font-size:16px;z-index:7}
+</style>
+</head>
+<body>
+<div id="stage">
+<div id="topline"><div id="brand">FARACHI</div><div id="chapter">معمایی به قدمت ۱۶۷ سال</div></div>
+<div id="progress"><div id="progress-fill"></div></div>
+<div id="clock"></div>
+<svg viewBox="0 0 1920 1080" role="img" aria-label="Riemann hypothesis explainer motion graphics">
+<defs>
+ <linearGradient id="cyanGrad" x1="0" x2="1"><stop offset="0" stop-color="#55e6d2" stop-opacity=".18"/><stop offset="1" stop-color="#55e6d2" stop-opacity=".95"/></linearGradient>
+ <linearGradient id="amberGrad" x1="0" x2="1"><stop offset="0" stop-color="#ffb45c" stop-opacity=".12"/><stop offset="1" stop-color="#ffb45c" stop-opacity=".9"/></linearGradient>
+ <radialGradient id="glow"><stop offset="0" stop-color="#55e6d2" stop-opacity=".35"/><stop offset="1" stop-color="#55e6d2" stop-opacity="0"/></radialGradient>
+ <pattern id="grid" width="64" height="64" patternUnits="userSpaceOnUse"><path d="M64 0H0V64" fill="none" stroke="#203452" stroke-width="1" opacity=".55"/></pattern>
+ <filter id="soft"><feGaussianBlur stdDeviation="16"/></filter>
+</defs>
+<rect width="1920" height="1080" fill="url(#grid)" opacity=".34"/>
+
+<!-- 01 / Hook -->
+<g id="scene-hook" class="scene">
+ <circle cx="960" cy="465" r="330" fill="url(#glow)"/>
+ <circle cx="960" cy="465" r="275" fill="none" stroke="#203b5c" stroke-width="2"/>
+ <circle id="hook-orbit" cx="960" cy="465" r="275" fill="none" stroke="#55e6d2" stroke-width="5" stroke-dasharray="420 1320" stroke-linecap="round"/>
+ <circle cx="960" cy="465" r="220" fill="none" stroke="#344968" stroke-width="2" stroke-dasharray="5 18"/>
+ <text x="960" y="445" text-anchor="middle" class="math cyan" font-size="190" font-weight="700">167</text>
+ <text x="960" y="530" text-anchor="middle" fill="#eaf3ff" font-size="42" font-weight="700">سال انتظار برای یک پاسخ</text>
+ <text id="hook-question" x="1430" y="270" text-anchor="middle" class="amber" font-size="180" font-weight="800">؟</text>
+ <g id="hook-symbols" fill="#8294b7" font-size="36" class="math">
+  <text x="480" y="280">π</text><text x="1370" y="690">ζ(s)</text><text x="530" y="720">∞</text><text x="1200" y="220">∑</text>
+ </g>
+</g>
+
+<!-- 02 / Prime numbers -->
+<g id="scene-primes" class="scene">
+ <text x="960" y="210" text-anchor="middle" class="scene-title">الگوی پراکندگی اعداد اول</text>
+ <path d="M250 510H1670" stroke="#8294b7" stroke-width="4" stroke-linecap="round"/>
+ <path d="M1650 492L1680 510L1650 528" fill="none" stroke="#8294b7" stroke-width="4"/>
+ <g id="prime-markers"></g>
+ <text x="960" y="720" text-anchor="middle" fill="#55e6d2" font-size="36" font-weight="700">اعداد اول با فاصله‌های نامنظم ظاهر می‌شوند</text>
+ <g opacity=".65"><path d="M330 790H1590" stroke="#29405f" stroke-width="2"/><text x="960" y="850" text-anchor="middle" class="muted" font-size="25">خط اعداد — نمایش آموزشی</text></g>
+</g>
+
+<!-- 03 / Riemann -->
+<g id="scene-riemann" class="scene">
+ <text x="960" y="195" text-anchor="middle" class="scene-title">صفحه مختلط و خط بحرانی</text>
+ <rect x="390" y="245" width="1140" height="520" rx="26" fill="#0d1930" stroke="#29405f" stroke-width="2"/>
+ <g stroke="#203452" stroke-width="1.5" opacity=".8">
+  <path d="M500 300V710M620 300V710M740 300V710M860 300V710M980 300V710M1100 300V710M1220 300V710M1340 300V710M1460 300V710"/>
+  <path d="M450 350H1470M450 450H1470M450 550H1470M450 650H1470"/>
+ </g>
+ <path d="M470 550H1480M960 720V285" stroke="#9bb0cb" stroke-width="3"/>
+ <text x="1490" y="560" fill="#b9c9dd" font-size="25">Re(s)</text>
+ <text x="980" y="280" fill="#b9c9dd" font-size="25">Im(s)</text>
+ <path id="critical-line" d="M960 300V700" stroke="#55e6d2" stroke-width="7" stroke-linecap="round" stroke-dasharray="400" stroke-dashoffset="400"/>
+ <g id="zeta-zeros" fill="#ffb45c" stroke="#fff1d9" stroke-width="2">
+  <circle cx="960" cy="380" r="13"/><circle cx="960" cy="440" r="13"/><circle cx="960" cy="505" r="13"/><circle cx="960" cy="590" r="13"/><circle cx="960" cy="655" r="13"/>
+ </g>
+ <text x="1010" y="335" class="math cyan" font-size="34">Re(s) = 1/2</text>
+ <text x="960" y="820" text-anchor="middle" class="muted" font-size="25">نمودار مفهومی؛ نه نمایش همه صفرهای تابع</text>
+</g>
+
+<!-- 04 / Importance -->
+<g id="scene-importance" class="scene">
+ <text x="960" y="205" text-anchor="middle" class="scene-title">یکی از هفت مسئله جایزه هزاره</text>
+ <g id="millennium-tiles"></g>
+ <rect x="390" y="590" width="1140" height="175" rx="24" fill="#101d34" stroke="#29405f" stroke-width="2"/>
+ <path d="M470 710L610 680L750 694L890 645L1030 670L1170 625L1310 650L1450 610" fill="none" stroke="#55e6d2" stroke-width="5"/>
+ <path d="M470 690L610 650L750 670L890 615L1030 645L1170 590L1310 620L1450 575" fill="none" stroke="#ffb45c" stroke-width="3" stroke-dasharray="9 10" opacity=".8"/>
+ <text x="960" y="810" text-anchor="middle" class="muted" font-size="22">نمودار شماتیک برای توضیح مفهوم خطا</text>
+ <text x="960" y="865" text-anchor="middle" class="amber" font-size="32" font-weight="700">جایزه اعلام‌شده: ۱٬۰۰۰٬۰۰۰ دلار</text>
+</g>
+
+<!-- 05 / Human and AI -->
+<g id="scene-human-ai" class="scene">
+ <text x="960" y="205" text-anchor="middle" class="scene-title">همکاری انسان و هوش مصنوعی</text>
+ <g id="human-figure">
+  <circle cx="530" cy="390" r="72" fill="#ffb45c"/>
+  <path d="M405 690Q420 505 530 500Q640 505 655 690Z" fill="#b56f48"/>
+  <path d="M470 410Q530 455 590 410" fill="none" stroke="#5b3528" stroke-width="8" stroke-linecap="round"/>
+  <text x="530" y="755" text-anchor="middle" fill="#ffcf98" font-size="32">ریاضی‌دان</text>
+ </g>
+ <g id="ai-network"></g>
+ <g id="six-weeks">
+  <text x="960" y="820" text-anchor="middle" fill="#dce8f8" font-size="28">حدود شش هفته همکاری — طبق روایت منتشرشده</text>
+  <rect x="600" y="850" width="720" height="18" rx="9" fill="#243754"/>
+  <rect id="week-fill" x="600" y="850" width="0" height="18" rx="9" fill="url(#amberGrad)"/>
+ </g>
+</g>
+
+<!-- 06 / Lean code -->
+<g id="scene-lean" class="scene">
+ <text x="960" y="195" text-anchor="middle" class="scene-title">اثبات صوری با زبان Lean</text>
+ <rect x="250" y="255" width="800" height="500" rx="22" fill="#0b1425" stroke="#29405f" stroke-width="2"/>
+ <g id="code-lines" font-family="monospace" font-size="23" direction="ltr"></g>
+ <rect x="1110" y="280" width="540" height="450" rx="22" fill="#111f38" stroke="#29405f" stroke-width="2"/>
+ <g id="proof-tree" stroke="#55e6d2" stroke-width="4" fill="none">
+  <path d="M1380 385L1250 500M1380 385L1510 500M1250 500L1190 625M1250 500L1310 625M1510 500L1450 625M1510 500L1570 625"/>
+ </g>
+ <g fill="#132f4a" stroke="#55e6d2" stroke-width="3">
+  <rect x="1305" y="330" width="150" height="70" rx="15"/>
+  <rect x="1195" y="470" width="110" height="65" rx="13"/><rect x="1455" y="470" width="110" height="65" rx="13"/>
+  <rect x="1140" y="600" width="100" height="58" rx="12"/><rect x="1260" y="600" width="100" height="58" rx="12"/>
+  <rect x="1400" y="600" width="100" height="58" rx="12"/><rect x="1520" y="600" width="100" height="58" rx="12"/>
+ </g>
+ <text x="1380" y="375" text-anchor="middle" fill="#fff" font-size="27">THEOREM</text>
+ <text x="1380" y="715" text-anchor="middle" class="muted" font-size="22">درخت استدلال</text>
+ <text x="650" y="820" text-anchor="middle" class="amber" font-size="32" font-weight="700">حدود ۱۷٫۴ میلیون خط کد — عدد گزارش‌شده</text>
+</g>
+
+<!-- 07 / Machine verification -->
+<g id="scene-checks" class="scene">
+ <text x="960" y="205" text-anchor="middle" class="scene-title">چند مسیر مستقل برای بررسی صوری</text>
+ <path d="M430 500H1490" stroke="#29405f" stroke-width="6" stroke-linecap="round"/>
+ <g id="check-cards">
+  <g transform="translate(420 360)"><rect width="300" height="260" rx="25" fill="#11213a" stroke="#35516e" stroke-width="2"/><text x="150" y="80" text-anchor="middle" fill="#eaf3ff" font-size="30">Lean Core</text><circle class="check-ring" cx="150" cy="155" r="45" fill="none" stroke="#55e6d2" stroke-width="6"/><path class="check-mark" d="M125 155L143 174L180 132" fill="none" stroke="#55e6d2" stroke-width="9" stroke-linecap="round"/></g>
+  <g transform="translate(810 360)"><rect width="300" height="260" rx="25" fill="#11213a" stroke="#35516e" stroke-width="2"/><text x="150" y="80" text-anchor="middle" fill="#eaf3ff" font-size="30">Independent</text><circle class="check-ring" cx="150" cy="155" r="45" fill="none" stroke="#55e6d2" stroke-width="6"/><path class="check-mark" d="M125 155L143 174L180 132" fill="none" stroke="#55e6d2" stroke-width="9" stroke-linecap="round"/></g>
+  <g transform="translate(1200 360)"><rect width="300" height="260" rx="25" fill="#11213a" stroke="#35516e" stroke-width="2"/><text x="150" y="80" text-anchor="middle" fill="#eaf3ff" font-size="30">MIT Review</text><circle class="check-ring" cx="150" cy="155" r="45" fill="none" stroke="#55e6d2" stroke-width="6"/><path class="check-mark" d="M125 155L143 174L180 132" fill="none" stroke="#55e6d2" stroke-width="9" stroke-linecap="round"/></g>
+ </g>
+ <text x="960" y="730" text-anchor="middle" class="cyan" font-size="36" font-weight="700">گزارش‌شده: بررسی‌های ماشینی موفق</text>
+ <text x="960" y="790" text-anchor="middle" class="muted" font-size="24">این تأیید، جایگزین پذیرش علمی نهایی نیست.</text>
+</g>
+
+<!-- 08 / Human review -->
+<g id="scene-human-review" class="scene">
+ <text x="960" y="195" text-anchor="middle" class="scene-title">تأیید ماشینی با فهم انسانی یکی نیست</text>
+ <rect x="250" y="260" width="650" height="480" rx="26" fill="#10223a" stroke="#55e6d2" stroke-width="3"/>
+ <rect x="1020" y="260" width="650" height="480" rx="26" fill="#211e31" stroke="#ffb45c" stroke-width="3"/>
+ <text x="575" y="330" text-anchor="middle" fill="#55e6d2" font-size="34" font-weight="700">بررسی ماشینی</text>
+ <text x="1345" y="330" text-anchor="middle" fill="#ffb45c" font-size="34" font-weight="700">فهم انسانی</text>
+ <g id="machine-stack" fill="#1b3652" stroke="#55e6d2" stroke-width="2">
+  <rect x="390" y="390" width="370" height="55" rx="12"/><rect x="390" y="465" width="370" height="55" rx="12"/><rect x="390" y="540" width="370" height="55" rx="12"/>
+ </g>
+ <g fill="#d8f8f2" font-size="25"><text x="575" y="426" text-anchor="middle">قواعد صوری</text><text x="575" y="501" text-anchor="middle">بررسی گام‌ها</text><text x="575" y="576" text-anchor="middle">سازگاری منطقی</text></g>
+ <g id="reader">
+  <circle cx="1240" cy="445" r="54" fill="#ffb45c"/>
+  <path d="M1145 665Q1160 520 1240 520Q1320 520 1335 665Z" fill="#9d684b"/>
+  <path d="M1350 485L1515 485L1515 640L1350 640Z" fill="#f3e7d2" stroke="#ffb45c" stroke-width="5"/>
+  <path d="M1432 485V640" stroke="#a98c69" stroke-width="4"/>
+  <path d="M1375 525H1415M1450 525H1490M1375 560H1415M1450 560H1490M1375 595H1415M1450 595H1490" stroke="#a98c69" stroke-width="3"/>
+ </g>
+ <rect x="510" y="790" width="900" height="82" rx="18" fill="#17243a" stroke="#ff6f75" stroke-width="2"/>
+ <text x="960" y="843" text-anchor="middle" fill="#ffd7d9" font-size="30" font-weight="700">پذیرش علمی و بررسی انسانی هنوز ادامه دارد</text>
+</g>
+
+<!-- 09 / Future -->
+<g id="scene-future" class="scene">
+ <text x="960" y="205" text-anchor="middle" class="scene-title">آینده همکاری انسان و هوش مصنوعی</text>
+ <circle cx="550" cy="490" r="170" fill="url(#glow)"/>
+ <circle cx="1370" cy="490" r="170" fill="url(#glow)"/>
+ <g id="future-human">
+  <circle cx="550" cy="410" r="72" fill="#ffb45c"/>
+  <path d="M410 730Q420 520 550 520Q680 520 690 730Z" fill="#b56f48"/>
+ </g>
+ <g id="future-ai">
+  <rect x="1250" y="335" width="240" height="230" rx="55" fill="#173c53" stroke="#55e6d2" stroke-width="7"/>
+  <circle cx="1325" cy="435" r="20" fill="#55e6d2"/><circle cx="1415" cy="435" r="20" fill="#55e6d2"/>
+  <path d="M1320 495Q1370 535 1420 495" fill="none" stroke="#55e6d2" stroke-width="8" stroke-linecap="round"/>
+  <path d="M1370 335V285" stroke="#55e6d2" stroke-width="8"/><circle cx="1370" cy="270" r="16" fill="#ffb45c"/>
+ </g>
+ <g id="future-links" stroke="#55e6d2" stroke-width="4" fill="none" opacity=".8">
+  <path d="M650 420Q960 180 1270 420"/><path d="M690 600Q960 820 1250 600"/><path d="M650 500H1250" stroke-dasharray="12 16"/>
+ </g>
+ <text x="550" y="790" text-anchor="middle" fill="#ffcf98" font-size="30">انسان</text>
+ <text x="1370" y="790" text-anchor="middle" fill="#55e6d2" font-size="30">هوش مصنوعی</text>
+ <text x="960" y="875" text-anchor="middle" fill="#f5f8ff" font-size="50" font-weight="800">FARACHI</text>
+</g>
+</svg>
+<div id="caption-wrap"><div id="caption"></div></div>
+<div id="footnote">تصاویر نموداری، شماتیک و آموزشی‌اند.</div>
+</div>
+<script>
+const DEBUG = new URLSearchParams(location.search).has('debug');
+const $ = id => document.getElementById(id);
+const clamp = x => Math.max(0,Math.min(1,x));
+const ease = x => {x=clamp(x);return x*x*(3-2*x)};
+const ranges = [
+ {id:'hook',title:'معمای ۱۶۷ ساله',first:0,stop:4},
+ {id:'primes',title:'اعداد اول',first:4,stop:7},
+ {id:'riemann',title:'فرضیه ریمان',first:7,stop:11},
+ {id:'importance',title:'اهمیت مسئله',first:11,stop:14},
+ {id:'human-ai',title:'انسان و هوش مصنوعی',first:14,stop:17},
+ {id:'lean',title:'اثبات صوری با Lean',first:17,stop:20},
+ {id:'checks',title:'بررسی ماشینی',first:20,stop:24},
+ {id:'human-review',title:'بررسی انسانی',first:24,stop:29},
+ {id:'future',title:'آینده علم',first:29,stop:31}
+];
+let T = null, sceneTimes = [];
+function buildStatic(){
+ const primeGroup=$('prime-markers'), primes=new Set([2,3,5,7,11,13,17,19,23,29]);
+ for(let n=1;n<=30;n++){
+  const x=300+(n-1)*45.5, prime=primes.has(n);
+  const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  c.setAttribute('cx',x);c.setAttribute('cy',510);c.setAttribute('r',prime?17:10);
+  c.setAttribute('fill',prime?'#55e6d2':'#536887');c.setAttribute('opacity','0.16');
+  c.setAttribute('data-n',n);primeGroup.appendChild(c);
+  const tx=document.createElementNS('http://www.w3.org/2000/svg','text');
+  tx.setAttribute('x',x);tx.setAttribute('y',570);tx.setAttribute('text-anchor','middle');
+  tx.setAttribute('fill',prime?'#bdfaf2':'#8294b7');tx.setAttribute('font-size','22');tx.textContent=n;
+  primeGroup.appendChild(tx);
+ }
+ const tiles=$('millennium-tiles');
+ for(let i=0;i<7;i++){
+  const x=340+i*180, active=i===3;
+  const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+  g.setAttribute('transform',`translate(${x} 300)`);g.setAttribute('opacity','0.28');
+  g.innerHTML=`<rect width="145" height="205" rx="18" fill="${active?'#214b58':'#14233b'}" stroke="${active?'#55e6d2':'#3b4e6d'}" stroke-width="${active?5:2}"/><text x="72" y="82" text-anchor="middle" fill="${active?'#55e6d2':'#a9bad2'}" font-size="42">${i+1}</text><text x="72" y="130" text-anchor="middle" fill="#e9f2ff" font-size="19">${active?'Riemann':'مسئله'}</text>`;
+  tiles.appendChild(g);
+ }
+ const network=$('ai-network');
+ const pts=[];
+ for(let layer=0;layer<3;layer++)for(let j=0;j<5;j++)pts.push({x:850+layer*155,y:330+j*95+(layer%2?25:0),layer,j});
+ let lines='';
+ for(const a of pts)for(const b of pts)if(b.layer===a.layer+1)lines+=`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#55e6d2" stroke-width="2" opacity=".25"/>`;
+ let nodes=pts.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="15" fill="#153d55" stroke="#55e6d2" stroke-width="4" opacity=".25"/>`).join('');
+ network.innerHTML=lines+nodes;
+ const code=$('code-lines');
+ const codeRows=[
+  'theorem riemann_hypothesis :','  ∀ s : Complex,','  completedZeta s = 0 →','  0 < s.re → s.re < 1 →','  s.re = (1 / 2 : ℝ) := by',
+  '  intro s hzero hleft hright','  -- formal proof steps','  have h₁ := analytic_continuation s','  have h₂ := zero_classification s','  exact critical_line_result h₁ h₂',
+  '-- proof assistant checks each term','-- schematic code, not the actual proof'
+ ];
+ codeRows.forEach((line,i)=>{
+  const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+  t.setAttribute('x',300);t.setAttribute('y',315+i*32);t.setAttribute('fill',i===0?'#55e6d2':(i===7?'#ffb45c':'#b8c8dd'));
+  t.textContent=line;code.appendChild(t);
+ });
+}
+function makeSceneTimes(){
+ sceneTimes=ranges.map(r=>({
+  ...r,start:r.first===0?0:T.sentences[r.first].start,
+  end:r.stop<T.sentences.length?T.sentences[r.stop].start:T.duration
+ }));
+}
+function setOpacity(id,v){$(id).setAttribute('opacity',clamp(v).toFixed(4));}
+function animateScene(id,p,t){
+ if(id==='hook'){
+  $('hook-orbit').setAttribute('transform',`rotate(${-35+110*p} 960 465)`);
+  $('hook-question').setAttribute('transform',`translate(0 ${-25*(1-p)}) scale(${.82+.18*ease(p)})`);
+ }
+ if(id==='primes'){
+  $('prime-markers').querySelectorAll('circle').forEach((c,i)=>c.setAttribute('opacity',(.12+.88*ease(p*1.7-i*.045)).toFixed(3)));
+ }
+ if(id==='riemann'){
+  $('critical-line').setAttribute('stroke-dashoffset',String(400*(1-ease(p))));
+  $('zeta-zeros').setAttribute('opacity',String(ease((p-.18)/.55)));
+ }
+ if(id==='importance'){
+  [...$('millennium-tiles').children].forEach((g,i)=>g.setAttribute('opacity',String(.2+.8*ease(p*1.4-i*.11))));
+ }
+ if(id==='human-ai'){
+  $('ai-network').setAttribute('opacity',String(ease(p*1.5)));
+  $('week-fill').setAttribute('width',String(720*ease(p)));
+ }
+ if(id==='lean'){
+  [...$('code-lines').children].forEach((el,i)=>el.setAttribute('opacity',String(ease(p*1.7-i*.07))));
+  $('proof-tree').setAttribute('opacity',String(ease((p-.25)/.55)));
+ }
+ if(id==='checks'){
+  [...$('check-cards').children].forEach((g,i)=>g.setAttribute('opacity',String(ease(p*2-i*.42))));
+ }
+ if(id==='human-review'){
+  $('machine-stack').setAttribute('opacity',String(ease(p*1.6)));
+  $('reader').setAttribute('transform',`translate(0 ${18*(1-ease((p-.15)/.6))})`);
+ }
+ if(id==='future'){
+  $('future-links').setAttribute('opacity',String(.15+.75*ease(p)));
+  $('future-ai').setAttribute('transform',`translate(0 ${12*(1-ease(p))})`);
+ }
+}
+function update(t){
+ if(!T)return;
+ const D=T.duration;
+ $('progress-fill').style.width=(100*clamp(t/D))+'%';
+ if(DEBUG)$('clock').textContent=t.toFixed(2)+'s';
+ let active=sceneTimes.findIndex(s=>t>=s.start&&t<s.end);
+ if(active<0)active=sceneTimes.length-1;
+ const current=sceneTimes[active];
+ $('chapter').textContent=current.title;
+ sceneTimes.forEach((s,i)=>{
+  const fade=.55;
+  const a=ease((t-s.start)/fade);
+  const b=1-ease((t-(s.end-fade))/fade);
+  const alpha=i===active?Math.min(a,b):0;
+  setOpacity('scene-'+s.id,alpha);
+  if(i===active){
+   const p=clamp((t-s.start)/Math.max(.001,s.end-s.start));
+   animateScene(s.id,p,t);
+  }
+ });
+ let sentence=null;
+ for(const item of T.sentences){if(t>=item.start&&t<item.end+.12){sentence=item;break;}}
+ $('caption').textContent=sentence?sentence.text:'';
+ $('caption').style.opacity=sentence?String(ease((t-sentence.start)/.18)):0;
+}
+window.setTime=update;
+fetch('timings.json').then(r=>{if(!r.ok)throw new Error('timings.json missing');return r.json()})
+ .then(data=>{T=data;buildStatic();makeSceneTimes();return document.fonts?document.fonts.ready:Promise.resolve();})
+ .then(()=>{window.setTime(0);window.ready=true;})
+ .catch(err=>{document.getElementById('chapter').textContent='خطا در بارگذاری زمان‌بندی';console.error(err);});
+if(DEBUG)$('clock').style.display='block';
+</script>
+</body></html>
