@@ -7,7 +7,7 @@ on:
     paths:
       - "farachi_core/**"
       - "schemas/**"
-      - "tests/test_skill_manager.py"
+      - "tests/**"
       - ".github/workflows/test-core.yml"
   workflow_dispatch:
 
@@ -30,3 +30,14 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Validate project schema JSON
         run: python -m json.tool schemas/farachi-project.schema.json > /dev/null
+      - name: Run Quality Controller smoke audit
+        run: python -m farachi_core.quality_controller examples/minimal-project.json --root . --json-out build/quality-report.json --md-out build/quality-report.md
+      - name: Upload quality report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: farachi-quality-report
+          path: |
+            build/quality-report.json
+            build/quality-report.md
+          if-no-files-found: ignore
