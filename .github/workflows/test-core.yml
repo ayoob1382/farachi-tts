@@ -15,6 +15,49 @@ permissions:
   contents: read
 
 jobs:
+  spotlight-motion-render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/farachi-motion-skills
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install render dependencies
+        run: |
+          npm install
+          npx playwright install --with-deps chromium
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-vazirmatn || true
+      - name: Create audible sync markers (not voice)
+        run: python tests/spotlight-motion/make_sync_audio.py
+      - name: Render motion scene
+        run: |
+          mkdir -p build/spotlight
+          node render.js tests/spotlight-motion/spotlight.html build/spotlight/silent.mp4 --dir tests/spotlight-motion --fps 30 --workers 4
+      - name: Mux timing cue track
+        run: |
+          ffmpeg -y -i build/spotlight/silent.mp4 -i tests/spotlight-motion/sync-cues.wav -map 0:v -map 1:a -c:v copy -c:a aac -b:a 128k -shortest build/spotlight/spotlight-motion-test.mp4
+          ffprobe -v error -show_entries format=duration:stream=codec_name,width,height,r_frame_rate -of default=nw=1 build/spotlight/spotlight-motion-test.mp4
+      - name: Upload spotlight preview
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: farachi-spotlight-motion-test
+          path: |
+            build/spotlight/spotlight-motion-test.mp4
+            build/spotlight/silent.mp4
+            tests/spotlight-motion/timings.json
+            tests/spotlight-motion/spotlight.html
+            tests/spotlight-motion/sync-cues.wav
+          if-no-files-found: warn
+          retention-days: 7
+
   core-tests:
     runs-on: ubuntu-latest
     steps:
