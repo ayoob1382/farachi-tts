@@ -1,0 +1,13 @@
+{
+  "name": "Kinetic Typography",
+  "id": "kinetic-typography",
+  "version": "1.0.0",
+  "description": "Animate Persian and Latin text while preserving readability and correct shaping.",
+  "entrypoint": "SKILL.md",
+  "status": "draft",
+  "tags": [
+    "farachi",
+    "motion-graphics",
+    "video-production"
+  ]
+}
