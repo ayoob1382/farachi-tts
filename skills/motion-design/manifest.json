@@ -1,0 +1,13 @@
+{
+  "name": "Motion Design",
+  "id": "motion-design",
+  "version": "1.0.0",
+  "description": "Plan a coherent motion-graphics language for an educational video.",
+  "entrypoint": "SKILL.md",
+  "status": "draft",
+  "tags": [
+    "farachi",
+    "motion-graphics",
+    "video-production"
+  ]
+}
