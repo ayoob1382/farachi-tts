@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="fa" dir="rtl"><head><meta charset="utf-8">
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#080d19;color:#fff;font-family:"Vazirmatn","Vazir","DejaVu Sans",sans-serif}
+#stage{position:relative;width:1920px;height:1080px;overflow:hidden;background:radial-gradient(ellipse at 50% 42%,#1b2b49 0%,#101a2d 48%,#080d19 100%)}
+svg{position:absolute;inset:0;width:1920px;height:1080px}
+#top{position:absolute;top:48px;right:80px;left:80px;display:flex;justify-content:space-between;align-items:center;font-size:26px;color:#aab8d5}
+#chapter{font-size:34px;font-weight:800;color:#fff}
+#caption{position:absolute;bottom:0;left:0;right:0;height:150px;background:rgba(5,9,18,.94);border-top:2px solid #304464;display:flex;align-items:center;justify-content:center;padding:0 100px;text-align:center;font-size:38px;line-height:1.55;font-weight:700;color:#fff}
+#progress{position:absolute;bottom:150px;left:0;height:7px;background:#55d6be;width:0;transform-origin:left}
+#timer{position:absolute;left:80px;top:50px;direction:ltr;font:24px monospace;color:#91a7ca}
+.pill{fill:#182944;stroke:#6f8dbb;stroke-width:3}.accent{fill:#55d6be}.warm{fill:#ffb86b}.pink{fill:#f27fa5}.blue{fill:#6ca9ff}
+</style></head><body><div id="stage">
+<div id="top"><div id="chapter">آزمایش موتور موشن</div><div id="timer">00:00 / 08:00</div></div>
+<svg viewBox="0 0 1920 1080" aria-label="Motion graphics test">
+<defs>
+ <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#55d6be"/><stop offset="1" stop-color="#3e7de0"/></linearGradient>
+ <radialGradient id="glow"><stop stop-color="#55d6be" stop-opacity=".45"/><stop offset="1" stop-color="#55d6be" stop-opacity="0"/></radialGradient>
+ <filter id="shadow"><feGaussianBlur stdDeviation="18"/></filter>
+</defs>
+<circle id="halo" cx="960" cy="500" r="280" fill="url(#glow)"/>
+<g id="camera">
+ <g id="orbit">
+  <ellipse cx="960" cy="500" rx="440" ry="180" fill="none" stroke="#385174" stroke-width="3" stroke-dasharray="12 16"/>
+  <ellipse cx="960" cy="500" rx="300" ry="300" fill="none" stroke="#29405f" stroke-width="2"/>
+  <circle id="orb1" cx="1400" cy="500" r="34" class="accent"/><circle id="orb2" cx="660" cy="500" r="24" class="warm"/>
+  <circle cx="960" cy="200" r="18" class="pink"/>
+ </g>
+ <g id="cards">
+  <rect id="card1" x="420" y="350" width="260" height="210" rx="28" class="pill"/>
+  <rect id="card2" x="1240" y="350" width="260" height="210" rx="28" class="pill"/>
+  <circle id="ball" cx="960" cy="450" r="80" fill="url(#g1)"/>
+  <path id="arrow" d="M700 700 Q960 850 1220 700" fill="none" stroke="#ffb86b" stroke-width="12" stroke-linecap="round"/>
+ </g>
+ <g id="bars" opacity="0">
+  <path d="M480 760H1450" stroke="#62799d" stroke-width="4"/>
+  <rect class="bar" x="560" y="600" width="110" height="160" rx="16" fill="#55d6be"/>
+  <rect class="bar" x="760" y="480" width="110" height="280" rx="16" fill="#6ca9ff"/>
+  <rect class="bar" x="960" y="540" width="110" height="220" rx="16" fill="#ffb86b"/>
+  <rect class="bar" x="1160" y="390" width="110" height="370" rx="16" fill="#f27fa5"/>
+  <g fill="#c6d4ec" font-size="28"><text x="615" y="810" text-anchor="middle">A</text><text x="815" y="810" text-anchor="middle">B</text><text x="1015" y="810" text-anchor="middle">C</text><text x="1215" y="810" text-anchor="middle">D</text></g>
+ </g>
+ <g id="particles"></g>
+ <g id="transition" opacity="0"><circle cx="960" cy="500" r="20" fill="#fff"/></g>
+</g>
+</svg>
+<div id="progress"></div><div id="caption"></div></div>
+<script>
+const clamp=x=>Math.max(0,Math.min(1,x)), ease=x=>{x=clamp(x);return x*x*(3-2*x)};
+const lerp=(a,b,t)=>a+(b-a)*t;
+const $=id=>document.getElementById(id);
+let T=null;
+fetch('timings.json').then(r=>{if(!r.ok)throw Error('timings.json unavailable');return r.json()}).then(j=>{T=j;buildParticles();document.fonts.ready.then(()=>window.ready=true)}).catch(e=>{document.body.dataset.error=String(e);});
+function buildParticles(){let h='';for(let i=0;i<36;i++){const x=180+(i*137)%1560,y=190+(i*83)%610,r=5+(i%5)*3;h+=`<circle id="pt${i}" cx="${x}" cy="${y}" r="${r}" fill="${i%3===0?'#55d6be':i%3===1?'#6ca9ff':'#ffb86b'}" opacity=".65"/>`}$('particles').innerHTML=h}
+function setCaption(t){const s=T.sentences.find(x=>t>=x.start&&t<x.end+.2);$('caption').textContent=s?s.text:''}
+window.setTime=function(t){if(!T)return;const chapter=Math.min(5,Math.floor(t/80)),local=(t-chapter*80)/80;const titles=['ورود و خروج عناصر','حرکت مستقل چند عنصر','تغییر اندازه و چرخش','حرکت دوربین','ساخت نمودار متحرک','انتقال بین صحنه‌ها'];$('chapter').textContent=titles[chapter];$('timer').textContent=new Date(t*1000).toISOString().slice(14,19)+' / 08:00';$('progress').style.width=(t/480*100)+'%';setCaption(t);
+const camX=chapter===3?Math.sin(local*Math.PI*2)*150:0,camY=chapter===3?Math.cos(local*Math.PI*2)*45:0,zoom=chapter===3?1.12+.12*Math.sin(local*Math.PI*2):1;
+$('camera').setAttribute('transform',`translate(${camX} ${camY}) translate(960 500) scale(${zoom}) translate(-960 -500)`);
+const enter=ease(local*2),exit=ease((local-.72)/.28);$('card1').setAttribute('transform',`translate(${lerp(-650,0,enter)-exit*500} 0) rotate(${chapter===2?local*120:0} 550 455)`);$('card2').setAttribute('transform',`translate(${lerp(650,0,enter)+exit*500} 0) rotate(${chapter===2?-local*120:0} 1370 455)`);
+$('ball').setAttribute('transform',`translate(${Math.sin(t*1.7)*230} ${Math.cos(t*1.2)*100}) rotate(${t*90} 960 450) scale(${chapter===2?1+.45*Math.sin(local*Math.PI*6):1})`);
+$('arrow').setAttribute('stroke-dasharray',chapter===0?'900':'none');$('arrow').setAttribute('stroke-dashoffset',chapter===0?900*(1-enter):0);
+$('orbit').setAttribute('transform',`rotate(${t*18} 960 500) scale(${chapter===1?1+.12*Math.sin(local*Math.PI*8):1} 1)`);
+$('bars').setAttribute('opacity',chapter===4?1:0);document.querySelectorAll('.bar').forEach((b,i)=>{const h=[160,280,220,370][i]*(.25+.75*ease(local*1.5-i*.13));b.setAttribute('y',760-h);b.setAttribute('height',h)});
+$('particles').setAttribute('transform',`translate(${Math.sin(t*.7)*40} ${Math.cos(t*.9)*30}) rotate(${t*3} 960 500)`);for(let i=0;i<36;i++){$('pt'+i).setAttribute('opacity',.2+.8*(.5+.5*Math.sin(t*2+i)))}
+$('halo').setAttribute('r',220+70*Math.sin(t*1.3));$('transition').setAttribute('opacity',chapter===5?Math.pow(Math.abs(Math.sin(local*Math.PI*3)),8):0);$('transition').setAttribute('transform',`scale(${1+local*8})`);
+};
+</script></body></html>
