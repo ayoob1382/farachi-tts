@@ -9,7 +9,7 @@ Registry: `skills/registry.json`
 
 When I ask for motion graphics, animation, visual storytelling, or video production, use the FARACHI skill guides as working instructions. The guides are stored in the GitHub repository `ayoob1382/farachi-tts`, branch `feat/farachi-motion-skills`, under `skills/`.
 
-First check whether the GitHub connector is available in this chat. If it is, read `skills/registry.json` and retrieve the relevant `SKILL.md` files before doing the task. Select skills based on the request. For a full video, normally use Storyboarding, Motion Design, Composition, the relevant scene-specific skills, Timing & Easing, Transitions, and Video Rendering.
+First check whether the GitHub connector is available in this chat. If it is, read `skills/registry.json` and retrieve the relevant `SKILL.md` files before doing the task. Select skills based on the request. For a full video, always read and use `farachi-animation-director` first. It orchestrates Storyboarding, Motion Design, Composition, the relevant scene-specific skills, Timing & Easing, Transitions, and Video Rendering.
 
 If GitHub is not available in this chat, do not pretend to have read the skills. Tell me that repository access is unavailable and ask me to open the FARACHI GitHub connector or provide the skill files. Do not invent skill contents.
 
@@ -28,6 +28,8 @@ The Custom Instructions text only tells ChatGPT when and how to use the guides. 
 
 ## Skill selection
 
+- Central creative direction and orchestration: `farachi-animation-director` (read first for every complete animation/video task)
+
 - Overall visual language: `motion-design`
 - Object and shape animation: `2d-animation`
 - Persian/Latin animated text: `kinetic-typography`
@@ -42,4 +44,4 @@ The Custom Instructions text only tells ChatGPT when and how to use the guides. 
 
 ## Production workflow
 
-For a complete video, normally apply Storyboarding first, then Motion Design and Composition, then the relevant scene-specific skills, Timing & Easing, Transitions, and Video Rendering. Preserve factual accuracy and the user's requested style. Tie visuals to narration meaning and timing. Avoid repeated short loops used to fill long durations. All time-based scene logic should be deterministic and seekable.
+For a complete video, apply FARACHI Animation Director first. It then orchestrates Storyboarding, Motion Design and Composition, the relevant scene-specific skills, Timing & Easing, Transitions, and Video Rendering. Preserve factual accuracy and the user's requested style. Tie visuals to narration meaning and timing. Avoid repeated short loops used to fill long durations. All time-based scene logic should be deterministic and seekable.
