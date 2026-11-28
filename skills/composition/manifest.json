@@ -1,0 +1,13 @@
+{
+  "name": "Composition",
+  "id": "composition",
+  "version": "1.0.0",
+  "description": "Compose each frame for a 16:9 or explicitly requested aspect ratio, with mobile readability as a priority.",
+  "entrypoint": "SKILL.md",
+  "status": "draft",
+  "tags": [
+    "farachi",
+    "motion-graphics",
+    "video-production"
+  ]
+}
