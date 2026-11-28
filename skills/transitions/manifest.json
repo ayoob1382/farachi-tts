@@ -1,0 +1,13 @@
+{
+  "name": "Transitions",
+  "id": "transitions",
+  "version": "1.0.0",
+  "description": "Choose transitions that express a relationship between scenes: match cut, shared-object movement, shape morph, directional wipe, camera move, or a restrained dissolve.",
+  "entrypoint": "SKILL.md",
+  "status": "draft",
+  "tags": [
+    "farachi",
+    "motion-graphics",
+    "video-production"
+  ]
+}
