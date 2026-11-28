@@ -1,0 +1,16 @@
+{
+  "id": "farachi-animation-director",
+  "name": "FARACHI Animation Director",
+  "version": "1.0.0",
+  "description": "Orchestrates FARACHI specialist skills to direct coherent, high-quality educational motion graphics from narration through storyboard, choreography, deterministic implementation, visual review, and quality gate.",
+  "entrypoint": "SKILL.md",
+  "status": "draft",
+  "tags": [
+    "farachi",
+    "animation-direction",
+    "motion-graphics",
+    "storytelling",
+    "quality-control",
+    "orchestration"
+  ]
+}
