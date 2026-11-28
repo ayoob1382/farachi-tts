@@ -1,9 +1,16 @@
 {
   "name": "FARACHI Motion Skills",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "status": "draft_ready_for_review",
-  "description": "Original, project-specific guidance for planning and producing educational motion graphics. These files are reusable instructions, not executable plugins and not a global installation into the GPT model.",
+  "description": "Original project-specific guidance for planning and producing educational motion graphics, including a central animation-director orchestration skill. These files are reusable instructions, not executable plugins and not a global installation into the GPT model.",
   "skills": [
+    {
+      "id": "farachi-animation-director",
+      "name": "FARACHI Animation Director",
+      "path": "skills/farachi-animation-director/SKILL.md",
+      "manifest": "skills/farachi-animation-director/manifest.json",
+      "status": "draft"
+    },
     {
       "id": "motion-design",
       "name": "Motion Design",
