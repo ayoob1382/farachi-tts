@@ -1,0 +1,12 @@
+{
+  "id": "video-rendering",
+  "name": "Video Rendering",
+  "version": "1.0.0",
+  "entrypoint": "SKILL.md",
+  "status": "draft",
+  "tags": [
+    "farachi",
+    "rendering",
+    "video"
+  ]
+}
