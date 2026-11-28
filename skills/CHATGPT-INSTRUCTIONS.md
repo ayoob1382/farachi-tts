@@ -1,15 +1,33 @@
 # FARACHI Skills: ChatGPT Usage Instructions
 
-Use the FARACHI skill guides as task-specific working instructions when this repository is connected and its files are accessible in the current conversation.
-
 Repository: https://github.com/ayoob1382/farachi-tts
+Branch: `feat/farachi-motion-skills`
 Skill index: `skills/README.md`
 Registry: `skills/registry.json`
 
-## Operating rule
-Before a task involving motion graphics or video production, identify the relevant skill guides and read their `SKILL.md` files. Do not claim a skill was loaded if the file was not actually retrieved. If GitHub access is unavailable in this chat, ask the user to attach the relevant skill file or use a ChatGPT Project containing the skill documents.
+## Copy this block into ChatGPT Custom Instructions
+
+When I ask for motion graphics, animation, visual storytelling, or video production, use the FARACHI skill guides as working instructions. The guides are stored in the GitHub repository `ayoob1382/farachi-tts`, branch `feat/farachi-motion-skills`, under `skills/`.
+
+First check whether the GitHub connector is available in this chat. If it is, read `skills/registry.json` and retrieve the relevant `SKILL.md` files before doing the task. Select skills based on the request. For a full video, normally use Storyboarding, Motion Design, Composition, the relevant scene-specific skills, Timing & Easing, Transitions, and Video Rendering.
+
+If GitHub is not available in this chat, do not pretend to have read the skills. Tell me that repository access is unavailable and ask me to open the FARACHI GitHub connector or provide the skill files. Do not invent skill contents.
+
+Keep visuals tied to the meaning and timing of narration. Preserve factual accuracy, Persian RTL text shaping, phone readability, and deterministic absolute-time animation. Do not fill long durations by repeating a short loop. Before rendering, inspect the scene plan for meaningful visual variation and verify the actual renderer contract from the repository.
+
+These skill documents are project instructions, not executable plugins and not a modification of the GPT model. Do not claim they are globally installed or automatically loaded unless the platform confirms that.
+
+## How to enable the instructions
+
+1. Open ChatGPT Settings.
+2. Open Personalization, then Custom Instructions.
+3. Paste the block above into the field for instructions about how ChatGPT should respond.
+4. Save the changes.
+
+The Custom Instructions text only tells ChatGPT when and how to use the guides. It does not grant GitHub access. In each new chat, the GitHub connector must be available and authorized for the assistant to retrieve the files.
 
 ## Skill selection
+
 - Overall visual language: `motion-design`
 - Object and shape animation: `2d-animation`
 - Persian/Latin animated text: `kinetic-typography`
@@ -23,7 +41,5 @@ Before a task involving motion graphics or video production, identify the releva
 - Renderer implementation and validation: `video-rendering`
 
 ## Production workflow
-For a complete video, normally apply Storyboarding first, then Motion Design and Composition, then the relevant scene-specific skills, Timing & Easing, Transitions, and Video Rendering. Preserve factual accuracy and the user's requested style. Tie visuals to narration meaning and timing. Avoid repeated short loops used to fill long durations. All time-based scene logic should be deterministic and seekable.
 
-## Honesty and limitations
-These files are project guidance, not executable software and not a modification of the GPT model. Repository access is not automatically available in every unrelated chat. Never imply global installation or automatic loading unless the platform explicitly confirms it.
+For a complete video, normally apply Storyboarding first, then Motion Design and Composition, then the relevant scene-specific skills, Timing & Easing, Transitions, and Video Rendering. Preserve factual accuracy and the user's requested style. Tie visuals to narration meaning and timing. Avoid repeated short loops used to fill long durations. All time-based scene logic should be deterministic and seekable.
