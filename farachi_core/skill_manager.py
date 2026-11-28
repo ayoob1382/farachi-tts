@@ -114,11 +114,16 @@ class SkillRegistry:
         """Resolve dependencies and return a stable topological production order."""
         requested = requested or list(PRODUCTION_ORDER)
         selected: set[str] = set()
+        visiting: set[str] = set()
+        ordered: list[str] = []
 
         def include(skill_id: str) -> None:
-            skill = self.get(skill_id)
+            if skill_id in visiting:
+                raise CoreError(f"Circular skill dependency detected at: {skill_id}")
             if skill_id in selected:
                 return
+            skill = self.get(skill_id)
+            visiting.add(skill_id)
             deps = skill.get("depends_on", [])
             if not isinstance(deps, list):
                 raise CoreError(f"depends_on must be an array for {skill_id}")
@@ -126,16 +131,15 @@ class SkillRegistry:
                 if not isinstance(dep, str):
                     raise CoreError(f"Invalid dependency in {skill_id}: {dep!r}")
                 include(dep)
+            visiting.remove(skill_id)
             selected.add(skill_id)
-
-        for skill_id in requested:
-            include(skill_id)
+            ordered.append(skill_id)
 
         order_index = {name: i for i, name in enumerate(PRODUCTION_ORDER)}
-        return sorted(
-            selected,
-            key=lambda item: (order_index.get(item, len(order_index)), item),
-        )
+        roots = sorted(dict.fromkeys(requested), key=lambda item: (order_index.get(item, len(order_index)), item))
+        for skill_id in roots:
+            include(skill_id)
+        return ordered
 
 
 def select_skills(task: str, explicit: list[str] | None = None) -> list[str]:
@@ -161,7 +165,13 @@ def build_execution_plan(
     requested = project.get("selected_skills", [])
     if not isinstance(requested, list):
         raise CoreError("selected_skills must be an array")
-    routed = select_skills(task, requested)
+    scene_requested = [
+        skill_id
+        for scene in project.get("scenes", [])
+        if isinstance(scene, dict)
+        for skill_id in scene.get("skill_ids", [])
+    ]
+    routed = select_skills(task, list(dict.fromkeys(requested + scene_requested)))
     # Base production passes are always included. Scene-specific skills are added
     # only when requested or detected from the brief.
     base = [
