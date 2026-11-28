@@ -1,0 +1,12 @@
+{
+  "id": "visual-effects",
+  "name": "Visual Effects",
+  "version": "1.0.0",
+  "entrypoint": "SKILL.md",
+  "status": "draft",
+  "tags": [
+    "farachi",
+    "effects",
+    "motion-graphics"
+  ]
+}
