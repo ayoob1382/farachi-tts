@@ -5,12 +5,13 @@ on:
     paths:
       - "tests/spotlight-motion/**"
       - ".github/workflows/spotlight-motion-test.yml"
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
   render:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -21,31 +22,31 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install renderer and media dependencies
+      - name: Install tools
         run: |
+          pip install numpy
           npm install
           npx playwright install --with-deps chromium
           sudo apt-get update
           sudo apt-get install -y ffmpeg fonts-vazirmatn || true
-      - name: Generate sync cue track
-        run: python tests/spotlight-motion/make_sync_audio.py
-      - name: Render animation (absolute-time timeline)
+      - name: Generate preview narration timeline (synthetic test voice)
         run: |
           mkdir -p build/spotlight
-          node render.js tests/spotlight-motion/spotlight.html build/spotlight/silent.mp4 --dir tests/spotlight-motion --fps 30 --workers 4
-      - name: Mux audible timing cues into preview
+          python build_audio.py spotlight.json --out build/spotlight --fake
+      - name: Render visual frames
+        run: node render.js tests/spotlight-motion/spotlight.html build/spotlight/silent.mp4 --dir build/spotlight --fps 30 --workers 4
+      - name: Create preview music
+        run: python make_music.py build/spotlight/music.wav
+      - name: Mix narration, music, and animation
         run: |
-          ffmpeg -y -i build/spotlight/silent.mp4 -i tests/spotlight-motion/sync-cues.wav -map 0:v -map 1:a -c:v copy -c:a aac -b:a 128k -shortest build/spotlight/spotlight-motion-test.mp4
-          ffprobe -v error -show_entries format=duration:stream=codec_name,width,height,r_frame_rate -of default=nw=1 build/spotlight/spotlight-motion-test.mp4
-      - name: Upload preview and source
+          python mix.py build/spotlight/timings.json build/spotlight/voice.wav build/spotlight/music.wav build/spotlight/silent.mp4 build/spotlight/final.mp4
+          ffprobe -v error -show_entries format=duration:stream=codec_name,width,height,r_frame_rate -of default=nw=1 build/spotlight/final.mp4
+      - uses: actions/upload-artifact@v4
         if: always()
-        uses: actions/upload-artifact@v4
         with:
           name: farachi-spotlight-motion-test
           path: |
-            build/spotlight/spotlight-motion-test.mp4
-            build/spotlight/silent.mp4
-            tests/spotlight-motion/timings.json
+            build/spotlight/final.mp4
+            build/spotlight/timings.json
             tests/spotlight-motion/spotlight.html
-            tests/spotlight-motion/sync-cues.wav
           retention-days: 7
