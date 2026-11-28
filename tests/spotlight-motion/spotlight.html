@@ -1,83 +1,91 @@
 <!doctype html>
-<html lang="fa" dir="rtl"><head><meta charset="utf-8"><title>FARACHI Motion Test — Spotlight</title>
+<html lang="fa" dir="rtl"><head><meta charset="utf-8">
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#101a2a;color:#f7f7ff;font-family:Vazirmatn,Vazir,"Noto Sans Arabic",sans-serif}
-#stage{position:relative;width:1920px;height:1080px;background:linear-gradient(145deg,#17263a,#0b1220)}
-svg{position:absolute;width:1920px;height:1080px;inset:0}.scene{opacity:0;pointer-events:none}
-#caption{position:absolute;left:120px;right:120px;bottom:95px;height:135px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:48px;font-weight:700;line-height:1.5;color:#fff;opacity:0;text-shadow:0 4px 24px #000;direction:rtl}
-#badge{position:absolute;top:45px;right:80px;color:#79e5d5;font-size:28px;font-weight:bold;letter-spacing:3px}
-#subtitle-line{position:absolute;left:100px;right:100px;bottom:64px;height:3px;background:#34445c}
-#sub-progress{height:100%;width:0;background:#79e5d5}
-</style></head><body><div id="stage"><div id="badge">FARACHI · MOTION TEST</div><svg viewBox="0 0 1920 1080">
-<defs><radialGradient id="beam"><stop offset="0" stop-color="#fff8bd" stop-opacity=".75"/><stop offset="1" stop-color="#ffe886" stop-opacity="0"/></radialGradient><filter id="glow"><feGaussianBlur stdDeviation="18"/></filter></defs>
-<!-- background scene layer shared props -->
-<g id="s1" class="scene">
-<rect width="1920" height="1080" fill="#111a2b"/>
-<path d="M0 810H1920" stroke="#31425b" stroke-width="8"/>
-<g id="person1"><circle cx="960" cy="510" r="76" fill="#f0bd85"/><path d="M830 790Q850 620 960 610Q1070 620 1090 790Z" fill="#e5a968"/><circle cx="930" cy="500" r="9" fill="#142034"/><circle cx="990" cy="500" r="9" fill="#142034"/><path id="mouth" d="M936 550Q960 570 984 550" stroke="#714b3b" stroke-width="6" fill="none"/></g>
-<g id="eyes" fill="#f8f4e8" stroke="#6a7a94" stroke-width="4"><g id="eye0"><ellipse cx="430" cy="330" rx="44" ry="27"/><circle cx="430" cy="330" r="12" fill="#26344a"/></g><g id="eye1"><ellipse cx="1480" cy="350" rx="44" ry="27"/><circle cx="1480" cy="350" r="12" fill="#26344a"/></g><g id="eye2"><ellipse cx="650" cy="240" rx="44" ry="27"/><circle cx="650" cy="240" r="12" fill="#26344a"/></g><g id="eye3"><ellipse cx="1260" cy="230" rx="44" ry="27"/><circle cx="1260" cy="230" r="12" fill="#26344a"/></g></g>
-<g id="thought"><text x="960" y="165" fill="#a8b6cc" font-size="32" text-anchor="middle">همه نگاه‌ها روی من؟</text></g></g>
-<g id="s2" class="scene"><rect width="1920" height="1080" fill="#101827"/><path d="M0 810H1920" stroke="#2b3c55" stroke-width="8"/>
-<g id="spotbeam"><path id="beamShape" d="M760 160L1160 160L1440 790L480 790Z" fill="url(#beam)" opacity=".25"/><circle cx="960" cy="145" r="95" fill="#fff3b2" opacity=".2" filter="url(#glow)"/><circle cx="960" cy="145" r="52" fill="#fff5bc"/></g>
-<g id="person2"><circle cx="960" cy="515" r="72" fill="#f0bd85"/><path d="M830 790Q850 630 960 610Q1070 630 1090 790Z" fill="#e5a968"/><circle cx="935" cy="505" r="8" fill="#142034"/><circle cx="985" cy="505" r="8" fill="#142034"/><path d="M938 550Q960 568 982 550" stroke="#714b3b" stroke-width="6" fill="none"/></g></g>
-<g id="s3" class="scene"><rect width="1920" height="1080" fill="#101d2d"/><path d="M0 810H1920" stroke="#2b3c55" stroke-width="8"/>
-<g id="crowd"><g id="c1"><circle cx="340" cy="555" r="52" fill="#dbb17c"/><path d="M250 760Q265 640 340 630Q415 640 430 760Z" fill="#62a6b5"/><rect x="280" y="690" width="110" height="95" rx="15" fill="#1a2a3d"/><path d="M315 725L350 755" stroke="#8de5d4" stroke-width="9"/></g>
-<g id="c2"><circle cx="650" cy="545" r="55" fill="#b8795b"/><path d="M555 760Q575 635 650 625Q725 635 745 760Z" fill="#b9c2d3"/><rect x="598" y="680" width="105" height="105" rx="14" fill="#20364a"/></g>
-<g id="c3"><circle cx="1270" cy="550" r="53" fill="#e1ae7b"/><path d="M1175 760Q1190 640 1270 630Q1350 640 1365 760Z" fill="#9b85c6"/><rect x="1215" y="680" width="108" height="95" rx="14" fill="#20364a"/></g>
-<g id="c4"><circle cx="1580" cy="540" r="56" fill="#a96e53"/><path d="M1485 760Q1500 630 1580 620Q1660 630 1675 760Z" fill="#d3a25e"/><rect x="1528" y="680" width="105" height="95" rx="14" fill="#20364a"/></g></g>
-<g id="bubbles" fill="#f1f5fb" stroke="#c9d5e6" stroke-width="4"><g id="bubbleA"><rect x="220" y="270" width="220" height="100" rx="28"/><path d="M340 370L365 400L390 370" fill="#f1f5fb"/></g><g id="bubbleB"><rect x="530" y="245" width="240" height="100" rx="28"/><path d="M640 345L660 375L685 345" fill="#f1f5fb"/></g><g id="bubbleC"><rect x="1150" y="260" width="220" height="100" rx="28"/><path d="M1250 360L1275 390L1295 360" fill="#f1f5fb"/></g><g id="bubbleD"><rect x="1470" y="230" width="220" height="100" rx="28"/><path d="M1570 330L1595 360L1615 330" fill="#f1f5fb"/></g></g><g fill="#26364c" font-size="35"><text x="330" y="335" text-anchor="middle">فکر خودم</text><text x="650" y="310" text-anchor="middle">پیام‌ها</text><text x="1260" y="325" text-anchor="middle">کارها</text><text x="1580" y="295" text-anchor="middle">خرید</text></g></g>
-<g id="s4" class="scene"><rect width="1920" height="1080" fill="#112033"/><path d="M0 810H1920" stroke="#31465f" stroke-width="8"/>
-<g id="independent"><g id="pA"><circle cx="320" cy="520" r="60" fill="#d7a679"/><path d="M215 785Q235 640 320 630Q405 640 425 785Z" fill="#76b2bb"/><path d="M260 510L280 490M350 490L370 510" stroke="#1a2636" stroke-width="8"/></g><g id="pB"><circle cx="700" cy="520" r="60" fill="#ba805e"/><path d="M595 785Q615 640 700 630Q785 640 805 785Z" fill="#b2a5d0"/><path d="M640 510L660 490M730 490L750 510" stroke="#1a2636" stroke-width="8"/></g><g id="pC"><circle cx="1220" cy="520" r="60" fill="#e2b780"/><path d="M1115 785Q1135 640 1220 630Q1305 640 1325 785Z" fill="#d5a45e"/><path d="M1160 510L1180 490M1250 490L1270 510" stroke="#1a2636" stroke-width="8"/></g><g id="pD"><circle cx="1600" cy="520" r="60" fill="#a96c51"/><path d="M1495 785Q1515 640 1600 630Q1685 640 1705 785Z" fill="#9eb4cc"/><path d="M1540 510L1560 490M1630 490L1650 510" stroke="#1a2636" stroke-width="8"/></g></g>
-<g id="busy"><circle cx="320" cy="385" r="65" fill="none" stroke="#78e2d5" stroke-width="6" stroke-dasharray="10 16"/><circle cx="700" cy="385" r="65" fill="none" stroke="#78e2d5" stroke-width="6" stroke-dasharray="10 16"/><circle cx="1220" cy="385" r="65" fill="none" stroke="#78e2d5" stroke-width="6" stroke-dasharray="10 16"/><circle cx="1600" cy="385" r="65" fill="none" stroke="#78e2d5" stroke-width="6" stroke-dasharray="10 16"/></g></g>
-<g id="s5" class="scene"><rect width="1920" height="1080" fill="#132338"/><path d="M0 810H1920" stroke="#31465f" stroke-width="8"/>
-<g id="calm"><circle cx="960" cy="505" r="88" fill="#f0bd85"/><path d="M790 810Q815 630 960 610Q1105 630 1130 810Z" fill="#75c0b7"/><circle cx="930" cy="490" r="10" fill="#182739"/><circle cx="990" cy="490" r="10" fill="#182739"/><path d="M915 550Q960 590 1005 550" fill="none" stroke="#6b4535" stroke-width="9" stroke-linecap="round"/><g id="relax-stars" fill="#ffdf85"><path d="M530 260l20 40 45 5-35 30-8 45-22-42-42-15 38-20z"/><path d="M1350 250l20 40 45 5-35 30-8 45-22-42-42-15 38-20z"/></g><circle id="calm-halo" cx="960" cy="510" r="260" fill="none" stroke="#75c0b7" stroke-width="5" stroke-dasharray="12 22"/></g></g>
-</svg><div id="caption"></div><div id="subtitle-line"><div id="sub-progress"></div></div></div>
+*{box-sizing:border-box}html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#11182a;font-family:"Vazirmatn","Vazir","Noto Naskh Arabic",sans-serif}
+#stage{width:1920px;height:1080px;position:relative;overflow:hidden;background:#11182a}
+svg{width:1920px;height:1080px;position:absolute;inset:0}
+#caption{position:absolute;left:160px;right:160px;bottom:58px;min-height:122px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:56px;line-height:1.35;font-weight:800;color:white;text-shadow:0 3px 14px #0009;opacity:0;direction:rtl}
+#toplabel{position:absolute;left:70px;top:52px;font-size:24px;color:#aab7d6;letter-spacing:2px;opacity:.7;direction:ltr}
+</style></head><body><div id="stage">
+<div id="toplabel">FARACHI • MOTION TEST</div>
+<svg viewBox="0 0 1920 1080" aria-label="Spotlight metaphor animation">
+<defs>
+ <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff4bd" stop-opacity=".75"/><stop offset="1" stop-color="#ffdb70" stop-opacity=".08"/></linearGradient>
+ <radialGradient id="warm"><stop stop-color="#ffca68" stop-opacity=".35"/><stop offset="1" stop-color="#ffca68" stop-opacity="0"/></radialGradient>
+ <linearGradient id="bg"><stop stop-color="#202b46"/><stop offset="1" stop-color="#11182a"/></linearGradient>
+</defs>
+<rect id="bgrect" width="1920" height="1080" fill="url(#bg)"/>
+<!-- stage floor and moving parallax decor -->
+<g id="room"><path d="M0 810 Q960 710 1920 810 V1080 H0Z" fill="#151f35"/><path d="M0 900 H1920" stroke="#2a3651" stroke-width="3"/><g id="stars" fill="#607096" opacity=".25"><circle cx="120" cy="180" r="3"/><circle cx="1660" cy="220" r="4"/><circle cx="1430" cy="110" r="2"/><circle cx="320" cy="350" r="2"/></g></g>
+<!-- crowd in 3 depth layers -->
+<g id="crowd">
+ <g id="p0" fill="#4b5d83"><circle cx="260" cy="560" r="52"/><rect x="205" y="620" width="110" height="205" rx="42"/></g>
+ <g id="p1" fill="#56678d"><circle cx="510" cy="650" r="44"/><rect x="464" y="700" width="92" height="175" rx="34"/></g>
+ <g id="p2" fill="#3e4f75"><circle cx="1390" cy="580" r="58"/><rect x="1328" y="646" width="124" height="210" rx="44"/></g>
+ <g id="p3" fill="#53648a"><circle cx="1660" cy="660" r="48"/><rect x="1610" y="710" width="100" height="175" rx="36"/></g>
+</g>
+<!-- thought bubbles and self-focused icons -->
+<g id="thoughts" opacity="0"><g fill="#e6edf9" stroke="#8295ba" stroke-width="3">
+ <rect x="145" y="260" width="300" height="130" rx="42"/><rect x="435" y="220" width="280" height="150" rx="44"/>
+ <rect x="1240" y="250" width="300" height="135" rx="42"/><rect x="1550" y="300" width="260" height="120" rx="42"/>
+</g><g fill="#4c5b7d" font-size="34" font-weight="bold" text-anchor="middle"><text x="295" y="335">فکرِ خودم...</text><text x="575" y="308">کارهای امروز</text><text x="1390" y="327">چی بخرم؟</text><text x="1680" y="375">پیام‌ها</text></g></g>
+<!-- spotlight -->
+<g id="spot"><path id="cone" fill="url(#beam)" d="M960 0 L760 850 L1160 850 Z"/><ellipse id="pool" cx="960" cy="820" rx="300" ry="90" fill="url(#warm)"/></g>
+<!-- central character, layered for body/head/arms -->
+<g id="hero" transform="translate(0 0)">
+ <g id="phone" transform="translate(1040 630) rotate(12)"><rect width="72" height="125" rx="14" fill="#101522" stroke="#8999b8" stroke-width="5"/><rect x="8" y="12" width="56" height="95" rx="6" fill="#7e9fd7"/><circle cx="36" cy="116" r="4" fill="#c2d0e6"/></g>
+ <g id="armL"><path d="M900 700 Q820 745 860 800" fill="none" stroke="#f1a36c" stroke-width="38" stroke-linecap="round"/></g>
+ <g id="armR"><path d="M1018 700 Q1070 735 1050 800" fill="none" stroke="#f1a36c" stroke-width="38" stroke-linecap="round"/></g>
+ <circle id="head" cx="960" cy="520" r="94" fill="#f1a36c"/>
+ <path id="hair" d="M870 515 Q875 405 960 420 Q1052 425 1050 530 Q1020 478 984 474 Q930 500 870 515" fill="#252b3e"/>
+ <rect id="body" x="865" y="620" width="190" height="260" rx="70" fill="#e37b61"/>
+ <g id="eyes" fill="#232a3b"><ellipse cx="930" cy="532" rx="10" ry="16"/><ellipse cx="990" cy="532" rx="10" ry="16"/></g>
+ <path id="mouth" d="M936 580 Q960 567 984 580" fill="none" stroke="#7c3f42" stroke-width="7" stroke-linecap="round"/>
+</g>
+<!-- spotlight moving off and fragments -->
+<g id="shards" opacity="0" fill="#ffdb70"><circle cx="800" cy="180" r="10"/><circle cx="1110" cy="260" r="8"/><circle cx="710" cy="420" r="7"/><circle cx="1240" cy="540" r="12"/><circle cx="850" cy="690" r="8"/></g>
+<!-- closing graphic -->
+<g id="relax" opacity="0"><circle cx="960" cy="510" r="220" fill="none" stroke="#9ed8c5" stroke-width="8" stroke-dasharray="18 20"/><path d="M790 520 Q960 650 1130 520" fill="none" stroke="#9ed8c5" stroke-width="14" stroke-linecap="round"/></g>
+</svg>
+<div id="caption"></div></div>
 <script>
-const T=JSON.parse(document.getElementById("timings-data")?.textContent||'{}');
-</script>
-<script id="timings-data" type="application/json">{
-  "duration": 16.824,
-  "title": "اثر اسپاتلایت (تست)",
-  "sentences": [
-    {
-      "start": 0.6,
-      "end": 3.808,
-      "text": "هیچ‌وقت شده حس کنی همه دارن بهت نگاه می‌کنن؟"
-    },
-    {
-      "start": 4.258,
-      "end": 6.776,
-      "text": "انگار یه نورافکن بالای سرته."
-    },
-    {
-      "start": 7.226,
-      "end": 10.922,
-      "text": "ولی واقعیت اینه که آدم‌ها خیلی کمتر دقت می‌کنن."
-    },
-    {
-      "start": 11.372,
-      "end": 13.452,
-      "text": "هر کی داره به خودش فکر می‌کنه."
-    },
-    {
-      "start": 13.902,
-      "end": 15.024,
-      "text": "پس راحت‌تر باش."
-    }
-  ]
-}</script>
-<script>
-const S=T.sentences||[], D=T.duration||16.824, E=(a,b,t)=>{let x=Math.max(0,Math.min(1,(t-a)/(b-a)));return x*x*(3-2*x)}, lerp=(a,b,p)=>a+(b-a)*p, set=(id,v)=>{let e=document.getElementById(id);if(e)e.style.opacity=v}, tr=(id,x,y,sc=1,rot=0)=>{let e=document.getElementById(id);if(e)e.setAttribute('transform',`translate(${x} ${y}) scale(${sc}) rotate(${rot})`)};
+const ease=x=>{x=Math.max(0,Math.min(1,x));return x*x*(3-2*x)};
+const out=x=>1-ease(x);
+let T=null;
+fetch('timings.json').then(r=>r.json()).then(j=>{T=j;document.fonts.ready.then(()=>window.ready=true)});
+const set=(id,attr,val)=>document.getElementById(id).setAttribute(attr,val);
+const tr=(id,x,y,s=1,rot=0)=>set(id,'transform',`translate(${x} ${y}) scale(${s}) rotate(${rot})`);
 window.setTime=function(t){
- t=Math.max(0,Math.min(D,t));let idx=S.findIndex(s=>t>=s.start&&t<=s.end);let active=idx>=0?idx:(t<S[0].start?0:S.length-1);
- for(let i=1;i<=5;i++)set('s'+i,i===active+1?1:0);
- let s=S[active], p=E(s.start,s.end,t);let cap=document.getElementById('caption');
- cap.textContent=s.text;cap.style.opacity=(idx>=0?1:0);document.getElementById('sub-progress').style.width=(t/D*100)+'%';
- if(idx===0){let pulse=E(.6,3.808,t);document.getElementById('person1').setAttribute('transform',`translate(0 ${Math.sin(t*5)*9})`);document.getElementById('eyes').setAttribute('transform',`rotate(${lerp(-8,8,p)} 960 360)`);document.getElementById('hook-question').style.opacity=0;document.getElementById('thought').setAttribute('transform',`translate(0 ${-30*p})`);document.getElementById('mouth').setAttribute('d',p>.5?'M936 550Q960 530 984 550':'M936 550Q960 570 984 550');}
- if(idx===1){let q=E(4.258,6.776,t);let bx=lerp(145,0,q), beam=document.getElementById('beamShape');beam.setAttribute('d',`M${760+bx} 160L${1160+bx} 160L${1440+bx} 790L${480+bx} 790Z`);document.getElementById('spotbeam').setAttribute('transform',`rotate(${lerp(-5,5,q)} 960 160)`);document.getElementById('person2').setAttribute('transform',`translate(0 ${Math.sin(t*4)*12})`);}
- if(idx===2){let q=E(7.226,10.922,t);['c1','c2','c3','c4'].forEach((id,i)=>{document.getElementById(id).setAttribute('transform',`translate(0 ${Math.sin(t*2+i)*6})`)});['bubbleA','bubbleB','bubbleC','bubbleD'].forEach((id,i)=>{document.getElementById(id).style.opacity=.2+.8*(.5+.5*Math.sin(t*2+i*1.7));});document.getElementById('crowd').setAttribute('transform',`translate(${lerp(80,0,q)} 0)`);}
- if(idx===3){let q=E(11.372,13.452,t);['pA','pB','pC','pD'].forEach((id,i)=>document.getElementById(id).setAttribute('transform',`translate(0 ${Math.sin(t*3+i)*7})`));document.getElementById('busy').style.opacity=.25+.65*(.5+.5*Math.sin(t*3));}
- if(idx===4){let q=E(13.902,15.024,t);document.getElementById('calm').setAttribute('transform',`translate(0 ${Math.sin(t*2)*4})`);document.getElementById('calm-halo').setAttribute('stroke-dashoffset',String(-t*24));}
+ if(!T)return;const S=T.sentences; const cap=document.getElementById('caption');
+ let cur=null;S.forEach(s=>{if(t>=s.start&&t<s.end+.25)cur=s});
+ cap.textContent=cur?cur.text:'';cap.style.opacity=cur?ease((t-cur.start)/.22):0;
+ const a=ease((t-S[0].start)/.8),aout=out((t-S[1].start)/.6);
+ // Beat 1: camera push-in, attention beam snaps down, nervous head turn
+ set('hero','transform',`translate(0 ${Math.sin(t*5)*4*a})`);
+ set('cone','d',`M960 0 L${960-260*a} 850 L${960+260*a} 850 Z`);
+ set('pool','rx',250+100*a);set('pool','opacity',aout);
+ set('head','transform',`rotate(${Math.sin(t*3)*8*a} 960 520)`);
+ // Beat 2: beam expands like spotlight, camera zoom illusion via scale
+ const b=ease((t-S[1].start)/.45), bOut=out((t-S[2].start)/.6);
+ set('cone','d',`M960 0 L${960-430*b} 900 L${960+430*b} 900 Z`);
+ set('spot','opacity',bOut);set('hero','opacity',1);
+ // Beat 3: reveal thoughts, crowd shifts focus to their own bubbles; spotlight fades
+ const c=ease((t-S[2].start)/.7);
+ set('thoughts','opacity',c);set('crowd','transform',`translate(0 ${-24*c})`);
+ set('p0','transform',`rotate(${-5*c} 260 700)`);set('p1','transform',`rotate(${6*c} 510 770)`);
+ set('p2','transform',`rotate(${-7*c} 1390 760)`);set('p3','transform',`rotate(${5*c} 1660 770)`);
+ // Beat 4: people turn away / attention is elsewhere, hero starts relaxing
+ const d=ease((t-S[3].start)/.7);
+ set('thoughts','transform',`translate(0 ${-40*d})`);
+ set('hero','transform',`translate(0 ${-20*d}) rotate(${-4*d})`);
+ set('eyes','opacity',1-d*.65);set('mouth','d',`M936 580 Q960 ${580+14*d} 984 580`);
+ // Beat 5: beam collapses into particles, hero drops phone, relaxed smile, graphic resolves
+ const e=ease((t-S[4].start)/.55);
+ set('spot','opacity',1-e);set('shards','opacity',e);
+ set('shards','transform',`translate(${-80*e} ${-180*e}) scale(${1+1.2*e})`);
+ set('phone','transform',`translate(${1040+130*e} ${630+100*e}) rotate(${12+55*e})`);
+ set('hero','transform',`translate(0 ${-20*d+35*e}) rotate(${-4*d+4*e})`);
+ set('relax','opacity',e);set('relax','transform',`scale(${.75+.25*e})`);
+ set('mouth','d',`M930 578 Q960 ${590+22*e} 990 578`);
 };
-window.ready=true;window.setTime(0);
 </script></body></html>
