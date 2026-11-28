@@ -1,0 +1,13 @@
+{
+  "name": "Timing & Easing",
+  "id": "timing-easing",
+  "version": "1.0.0",
+  "description": "Set motion timing to support meaning and narration.",
+  "entrypoint": "SKILL.md",
+  "status": "draft",
+  "tags": [
+    "farachi",
+    "motion-graphics",
+    "video-production"
+  ]
+}
