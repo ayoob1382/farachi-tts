@@ -6,12 +6,17 @@ on:
       - "tests/spotlight-motion/**"
       - ".github/workflows/spotlight-motion-test.yml"
   workflow_dispatch:
+    inputs:
+      tts_model:
+        description: "مدل TTS مورد استفاده در تست"
+        required: false
+        default: "gemini-3.8-flash-tts"
 permissions:
   contents: read
 jobs:
   render:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
         with:
@@ -29,24 +34,63 @@ jobs:
           npx playwright install --with-deps chromium
           sudo apt-get update
           sudo apt-get install -y ffmpeg fonts-vazirmatn || true
-      - name: Generate preview narration timeline (synthetic test voice)
+      - name: Validate real TTS credentials
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          if [ -z "$GEMINI_API_KEY" ]; then
+            echo "::error::GEMINI_API_KEY secret is missing. This test requires real Persian TTS; synthetic voice is intentionally disabled."
+            exit 1
+          fi
+      - name: Generate real Persian narration and exact timings
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_TTS_MODEL: ${{ inputs.tts_model || 'gemini-3.8-flash-tts' }}
         run: |
           mkdir -p build/spotlight
-          python build_audio.py spotlight.json --out build/spotlight --fake
+          python build_audio.py spotlight.json --out build/spotlight
+          python - <<'PY'
+          import wave, numpy as np
+          p='build/spotlight/voice.wav'
+          with wave.open(p,'rb') as w:
+              frames=w.readframes(w.getnframes())
+              x=np.frombuffer(frames,dtype=np.int16).astype(np.float32)
+              duration=w.getnframes()/w.getframerate()
+          rms=float(np.sqrt(np.mean(x*x)))
+          print(f"Real TTS WAV: {duration:.2f}s, RMS={rms:.1f}")
+          if duration < 2 or rms < 100:
+              raise SystemExit("Generated voice.wav is empty, too short, or effectively silent.")
+          PY
       - name: Render visual frames
         run: node render.js tests/spotlight-motion/spotlight.html build/spotlight/silent.mp4 --dir build/spotlight --fps 30 --workers 4
       - name: Create preview music
         run: python make_music.py build/spotlight/music.wav
-      - name: Mix narration, music, and animation
+      - name: Mix real narration, music, and animation
         run: |
           python mix.py build/spotlight/timings.json build/spotlight/voice.wav build/spotlight/music.wav build/spotlight/silent.mp4 build/spotlight/final.mp4
-          ffprobe -v error -show_entries format=duration:stream=codec_name,width,height,r_frame_rate -of default=nw=1 build/spotlight/final.mp4
+          ffprobe -v error -show_entries format=duration:stream=codec_type,codec_name,duration,width,height -of json build/spotlight/final.mp4 > build/spotlight/probe.json
+          python - <<'PY'
+          import json
+          p=json.load(open('build/spotlight/probe.json'))
+          streams=p.get('streams',[])
+          audio=[s for s in streams if s.get('codec_type')=='audio']
+          video=[s for s in streams if s.get('codec_type')=='video']
+          print(json.dumps(p,ensure_ascii=False,indent=2))
+          if not audio: raise SystemExit("FINAL MP4 HAS NO AUDIO STREAM")
+          if not video: raise SystemExit("FINAL MP4 HAS NO VIDEO STREAM")
+          if audio[0].get('codec_name') != 'aac': raise SystemExit("Unexpected audio codec")
+          PY
+          ffmpeg -hide_banner -i build/spotlight/final.mp4 -af volumedetect -vn -f null - 2> build/spotlight/audio-levels.txt
+          cat build/spotlight/audio-levels.txt | tail -20
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: farachi-spotlight-motion-test
+          name: farachi-spotlight-real-voice-test
           path: |
             build/spotlight/final.mp4
+            build/spotlight/voice.wav
             build/spotlight/timings.json
+            build/spotlight/probe.json
+            build/spotlight/audio-levels.txt
             tests/spotlight-motion/spotlight.html
           retention-days: 7
