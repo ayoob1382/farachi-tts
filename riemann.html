@@ -257,7 +257,7 @@ function makeSceneTimes(){
   end:r.stop<T.sentences.length?T.sentences[r.stop].start:T.duration
  }));
 }
-function setOpacity(id,v){$(id).setAttribute('opacity',clamp(v).toFixed(4));}
+function setOpacity(id,v){$(id).style.opacity=clamp(v).toFixed(4);}
 function animateScene(id,p,t){
  if(id==='hook'){
   $('hook-orbit').setAttribute('transform',`rotate(${-35+110*p} 960 465)`);
@@ -318,7 +318,7 @@ function update(t){
  $('caption').textContent=sentence?sentence.text:'';
  $('caption').style.opacity=sentence?String(ease((t-sentence.start)/.18)):0;
 }
-window.setTime=update;
+window.setTime = function(t){ update(t); };
 fetch('timings.json').then(r=>{if(!r.ok)throw new Error('timings.json missing');return r.json()})
  .then(data=>{T=data;buildStatic();makeSceneTimes();return document.fonts?document.fonts.ready:Promise.resolve();})
  .then(()=>{window.setTime(0);window.ready=true;})
