@@ -1,0 +1,13 @@
+{
+  "name": "Storyboarding",
+  "id": "storyboarding",
+  "version": "1.0.0",
+  "description": "Translate the complete narration into a timed visual plan.",
+  "entrypoint": "SKILL.md",
+  "status": "draft",
+  "tags": [
+    "farachi",
+    "motion-graphics",
+    "video-production"
+  ]
+}
