@@ -1,0 +1,13 @@
+{
+  "name": "Infographics",
+  "id": "infographics",
+  "version": "1.0.0",
+  "description": "Convert a process, system, or set of facts into a compact visual explanation.",
+  "entrypoint": "SKILL.md",
+  "status": "draft",
+  "tags": [
+    "farachi",
+    "motion-graphics",
+    "video-production"
+  ]
+}
