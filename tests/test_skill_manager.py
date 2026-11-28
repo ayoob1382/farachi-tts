@@ -68,10 +68,12 @@ class CoreContractTests(unittest.TestCase):
         }
         plan = build_execution_plan(project, registry)
         ids = [step["skill_id"] for step in plan["steps"]]
-        self.assertEqual(ids[0], "storyboarding")
+        self.assertEqual(ids[0], "farachi-animation-director")
+        self.assertEqual(ids[1], "storyboarding")
         self.assertIn("kinetic-typography", ids)
         self.assertIn("animated-charts", ids)
         self.assertIn("2d-animation", ids)
+        self.assertEqual(ids.count("farachi-animation-director"), 1)
         self.assertEqual(plan["plan_status"], "planned_not_executed")
 
     def test_registry_rejects_unknown_dependency(self):
