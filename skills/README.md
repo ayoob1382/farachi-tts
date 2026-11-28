@@ -20,3 +20,8 @@ These are instruction files, not executable plugins and not a global installatio
 
 ## Use
 Read the relevant `SKILL.md` before planning or implementing that part of a video. For a full production, combine Storyboarding, Motion Design, Composition, Timing & Easing, and the scene-specific skills. Use Video Rendering for final implementation and validation.
+
+
+## FARACHI Core
+
+The first executable Core implementation lives in [`farachi_core/`](../farachi_core/README.md). It validates project briefs and timing files, reads this skill registry, and produces a deterministic skill execution plan. It does not execute AI skills or replace the existing renderer.
