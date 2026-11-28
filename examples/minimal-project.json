@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0",
+  "project": {
+    "id": "phone-memory-explainer",
+    "title": "Why do we open our phone and forget why?",
+    "description": "A short Persian educational motion-graphics explainer.",
+    "language": "fa-IR",
+    "visual_focus": "Persian typography, animated diagrams, and everyday objects",
+    "aspect_ratio": "16:9",
+    "fps": 30
+  },
+  "duration_seconds": 45,
+  "narration": {
+    "script": "نمونه متن گویندگی برای تست قرارداد پروژه.",
+    "timings_file": "build/timings.json"
+  },
+  "selected_skills": [
+    "kinetic-typography",
+    "infographics"
+  ],
+  "scenes": [
+    {
+      "id": "hook",
+      "start": 0,
+      "end": 8,
+      "narration_ref": "sentence-01",
+      "visual": "A hand reaches for a phone; the screen lights up and the original intention appears as a fading thought bubble.",
+      "transition_in": "opening",
+      "assets": [],
+      "skill_ids": ["2d-animation", "kinetic-typography"]
+    },
+    {
+      "id": "explanation",
+      "start": 8,
+      "end": 25,
+      "narration_ref": "sentence-02",
+      "visual": "A simple animated attention diagram shows an intention being displaced by a notification.",
+      "transition_in": "match-cut",
+      "assets": [],
+      "skill_ids": ["infographics", "animated-charts"]
+    },
+    {
+      "id": "takeaway",
+      "start": 25,
+      "end": 45,
+      "narration_ref": "sentence-03",
+      "visual": "The phone moves aside while three concise visual takeaways assemble on screen.",
+      "transition_in": "shape-morph",
+      "assets": [],
+      "skill_ids": ["kinetic-typography", "visual-effects"]
+    }
+  ],
+  "render": {
+    "engine": "render.js",
+    "scene_file": "phone-memory-explainer.html",
+    "output_file": "build/final.mp4",
+    "fps": 30,
+    "workers": 4,
+    "width": 1920,
+    "height": 1080
+  }
+}
