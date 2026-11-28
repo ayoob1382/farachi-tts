@@ -6,10 +6,12 @@ from .skill_manager import (
     validate_project,
     validate_timings,
 )
+from .quality_controller import run_audit
 
 __all__ = [
     "SkillRegistry",
     "build_execution_plan",
     "validate_project",
     "validate_timings",
+    "run_audit",
 ]
