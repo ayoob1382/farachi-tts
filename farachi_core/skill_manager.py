@@ -143,7 +143,7 @@ def select_skills(task: str, explicit: list[str] | None = None) -> list[str]:
     text = (task or "").lower()
     chosen = list(explicit or [])
     for keyword, skill_ids in ROUTES.items():
-        if re.search(rf"\b{re.escape(keyword)}\b", text):
+        if re.search(rf"\b{re.escape(keyword)}s?\b", text):
             chosen.extend(skill_ids)
     # Stable de-duplication.
     return list(dict.fromkeys(chosen))
