@@ -1,0 +1,113 @@
+name: FARACHI — Riemann explainer
+
+on:
+  push:
+    branches:
+      - feat/farachi-motion-skills
+    paths:
+      - "riemann.json"
+      - "riemann.html"
+      - "projects/riemann/**"
+      - ".github/workflows/make-riemann-video.yml"
+  workflow_dispatch:
+    inputs:
+      fake_voice:
+        description: "Use synthetic voice for a free render/timing test (not suitable for publishing)"
+        type: boolean
+        default: true
+      tts_model:
+        description: "Gemini TTS model used when fake_voice is false"
+        type: string
+        default: "gemini-3.8-flash-tts"
+      workers:
+        description: "Parallel render workers"
+        type: string
+        default: "4"
+
+permissions:
+  contents: read
+
+jobs:
+  build-riemann:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/farachi-motion-skills
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install render dependencies
+        run: |
+          pip install numpy
+          npm install
+          npx playwright install --with-deps chromium
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          sudo apt-get install -y fonts-vazirmatn || true
+          ffmpeg -version | head -1
+
+      - name: Build narration and real timings
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_TTS_MODEL: ${{ inputs.tts_model }}
+          FAKE_VOICE: ${{ github.event_name == 'push' || inputs.fake_voice }}
+        run: |
+          mkdir -p build
+          if [ "$FAKE_VOICE" = "true" ]; then
+            echo "Using synthetic voice: render validation only."
+            python build_audio.py riemann.json --out build --fake
+          else
+            python build_audio.py riemann.json --out build
+          fi
+
+      - name: Build duration-accurate project contract
+        run: |
+          python projects/riemann/prepare_project.py build/timings.json build/riemann-project.json
+          python -m farachi_core.skill_manager validate-project build/riemann-project.json
+          python -m farachi_core.skill_manager plan build/riemann-project.json --out build/execution-plan.json
+
+      - name: Render nine-scene animation
+        env:
+          WORKERS: ${{ inputs.workers || '4' }}
+        run: |
+          node render.js riemann.html build/silent.mp4 --dir build --workers "$WORKERS"
+
+      - name: Mix narration, music and video
+        run: |
+          python make_music.py build/music.wav
+          python mix.py build/timings.json build/voice.wav build/music.wav build/silent.mp4 build/final.mp4
+          ffprobe -v error -show_entries format=duration:stream=codec_name,width,height,r_frame_rate -of default=nw=1 build/final.mp4
+
+      - name: Run Quality Controller on rendered MP4
+        run: |
+          python -m farachi_core.quality_controller build/riemann-project.json \
+            --root . \
+            --timings build/timings.json \
+            --scene riemann.html \
+            --video build/final.mp4 \
+            --json-out build/quality-report.json \
+            --md-out build/quality-report.md
+
+      - name: Upload video and audit artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: farachi-riemann-video-and-qc
+          path: |
+            build/final.mp4
+            build/silent.mp4
+            build/timings.json
+            build/riemann-project.json
+            build/execution-plan.json
+            build/quality-report.json
+            build/quality-report.md
+          if-no-files-found: warn
+          retention-days: 7
